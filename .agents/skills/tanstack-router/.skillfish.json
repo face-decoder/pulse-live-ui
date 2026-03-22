@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "tanstack-router",
+  "owner": "secondsky",
+  "repo": "claude-skills",
+  "path": "plugins/tanstack-router/skills/tanstack-router",
+  "branch": "main",
+  "sha": "74f4deca0aa1871a8f249df336b3f7865cede25c",
+  "source": "manual"
+}

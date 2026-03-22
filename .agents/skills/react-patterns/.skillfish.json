@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "react-patterns",
+  "owner": "involvex",
+  "repo": "involvex-claude-marketplace",
+  "path": "plugins/frontend/skills/react-patterns",
+  "branch": "main",
+  "sha": "b1bfa5f09e9f4b49f9aba76334cf1965229d5657",
+  "source": "manual"
+}
