@@ -16,30 +16,30 @@ function useCurrentTime(): string {
   return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-export default function VideoCaptureToolbar({
+export default function VideoCaptureHeader({
   isScreenSharing,
 }: VideoCaptureHeaderProps) {
   const time = useCurrentTime()
 
   return (
     <div className="flex items-center gap-3 p-4">
-      <div className="flex items-center gap-2 rounded-xl bg-black/40 px-4 py-2 backdrop-blur-xl border border-white/6">
-        <span className="text-sm font-semibold text-white/90">{time}</span>
-        <span className="h-4 w-px bg-white/15" />
-        <span className="text-sm text-white/50 font-medium">pulse-live</span>
+      <div className="flex items-center gap-2 rounded-xl bg-canvas/80 px-4 py-2 backdrop-blur-md border border-hairline">
+        <span className="text-sm font-semibold text-ink">{time}</span>
+        <span className="h-4 w-px bg-hairline" />
+        <span className="text-sm text-muted font-medium">pulse-live</span>
       </div>
 
       <div
-        className="flex h-8 w-8 items-center justify-center rounded-lg bg-black/30 backdrop-blur-xl border border-white/6"
+        className="flex h-8 w-8 items-center justify-center rounded-lg bg-canvas/80 backdrop-blur-md border border-hairline text-muted hover:text-ink cursor-help transition-colors"
         title="End-to-end encrypted"
       >
-        <Shield size={14} className="text-white/50" />
+        <Shield size={14} />
       </div>
 
       {isScreenSharing && (
-        <div className="flex items-center gap-1.5 rounded-xl bg-[#4fb8b2]/20 px-3 py-1.5 border border-[#4fb8b2]/30">
-          <MonitorUp size={14} className="text-[#4fb8b2]" />
-          <span className="text-xs font-semibold text-[#4fb8b2]">
+        <div className="flex items-center gap-1.5 rounded-xl bg-brand-mint/20 px-3 py-1.5 border border-brand-mint/30">
+          <MonitorUp size={14} className="text-brand-teal" />
+          <span className="text-xs font-semibold text-brand-teal">
             Presenting
           </span>
         </div>
@@ -47,3 +47,4 @@ export default function VideoCaptureToolbar({
     </div>
   )
 }
+

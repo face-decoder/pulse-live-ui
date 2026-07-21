@@ -1,15 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useWebSocket } from './use-web-socket'
-import type { PredictionResult } from '#/types'
+import type { PredictionResult, BBoxMessage, AlertMessage } from '#/types'
 import { ConnectionStatus } from '#/types/rtc'
 
 interface UseWebRTCOptions {
   url: string
   stream: MediaStream | null
   onPrediction?: (prediction: PredictionResult) => void
+  onBBox?: (bbox: BBoxMessage) => void
+  onAlert?: (alert: AlertMessage) => void
 }
 
-export function useWebRTC({ url, stream, onPrediction }: UseWebRTCOptions) {
+export function useWebRTC({ url, stream, onPrediction, onBBox, onAlert }: UseWebRTCOptions) {
   // prettier-ignore
   const [status, setStatus] = useState<ConnectionStatus>(ConnectionStatus.DISCONNECTED)
   const [error, setError] = useState<string | null>(null)
@@ -46,6 +48,14 @@ export function useWebRTC({ url, stream, onPrediction }: UseWebRTCOptions) {
         } else if (msg.type === 'prediction' || msg.type === 'error') {
           if (onPrediction) {
             onPrediction(msg)
+          }
+        } else if (msg.type === 'bbox') {
+          if (onBBox) {
+            onBBox(msg)
+          }
+        } else if (msg.type === 'alert') {
+          if (onAlert) {
+            onAlert(msg)
           }
         } else if (msg.type === 'heartbeat') {
           // ignore heartbeat

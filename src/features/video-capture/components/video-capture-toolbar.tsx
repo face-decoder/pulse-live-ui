@@ -36,18 +36,18 @@ export function ToolbarButton({
   onClick,
 }: ToolbarControlProps) {
   const base =
-    'group relative flex h-12 w-12 items-center justify-center rounded-full transition-all duration-200 cursor-pointer border-0 outline-none focus-visible:ring-2 focus-visible:ring-white/40'
+    'group relative flex h-11 w-11 items-center justify-center rounded-md transition-all duration-200 cursor-pointer border outline-none font-semibold text-sm select-none'
 
   let variant: string
   if (danger) {
     variant =
-      'bg-red-500 hover:bg-red-400 text-white shadow-lg shadow-red-500/30'
+      'bg-primary text-on-primary hover:bg-brand-coral hover:text-white border-transparent shadow-sm'
   } else if (active) {
-    variant = 'bg-red-500/90 hover:bg-red-400 text-white'
+    variant = 'bg-brand-pink text-white hover:bg-brand-pink/90 border-transparent shadow-sm'
   } else if (accent) {
-    variant = 'bg-[#4fb8b2] hover:bg-[#60d7cf] text-white'
+    variant = 'bg-brand-teal text-white hover:bg-brand-teal/90 border-transparent shadow-sm'
   } else {
-    variant = 'bg-white/10 hover:bg-white/20 text-white/90 hover:text-white'
+    variant = 'bg-canvas text-ink border-hairline hover:bg-surface-soft hover:border-muted-soft'
   }
 
   return (
@@ -58,7 +58,7 @@ export function ToolbarButton({
       aria-label={label}
       title={label}
     >
-      <Icon size={20} strokeWidth={1.8} />
+      <Icon size={18} strokeWidth={2} />
     </button>
   )
 }
@@ -73,10 +73,8 @@ export default function VideoCaptureToolbar({
   onLeave,
 }: VideoCaptureToolbarProps) {
   return (
-    <div className="flex w-full items-center justify-center px-4 pb-6 pt-16">
-      <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
-
-      <div className="relative flex items-center gap-3 rounded-2xl bg-[#202124]/80 px-5 py-3 shadow-2xl shadow-black/40 backdrop-blur-xl border border-white/6">
+    <div className="flex w-full items-center justify-center px-4 py-4 bg-surface-soft/60 border-t border-hairline">
+      <div className="flex items-center gap-3">
         <ToolbarButton
           icon={isMuted ? MicOff : Mic}
           label={isMuted ? 'Unmute' : 'Mute'}
@@ -98,11 +96,11 @@ export default function VideoCaptureToolbar({
           onClick={onToggleScreenShare}
         />
 
-        <div className="mx-1 h-8 w-px bg-white/10" />
+        <span className="mx-1 h-6 w-px bg-hairline" />
 
         <ToolbarButton
           icon={DoorOpen}
-          label="Logout"
+          label="Leave Session"
           danger
           onClick={onLeave}
         />
@@ -110,3 +108,4 @@ export default function VideoCaptureToolbar({
     </div>
   )
 }
+

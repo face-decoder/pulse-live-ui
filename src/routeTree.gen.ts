@@ -9,38 +9,153 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UploadRouteImport } from './routes/upload'
+import { Route as SummaryRouteImport } from './routes/summary'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HistoryIndexRouteImport } from './routes/history/index'
+import { Route as HistoryLatencyRouteImport } from './routes/history.latency'
+import { Route as HistorySessionIdRouteImport } from './routes/history/$sessionId'
+import { Route as HistorySessionIdLatencyRouteImport } from './routes/history/$sessionId.latency'
 
+const UploadRoute = UploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SummaryRoute = SummaryRouteImport.update({
+  id: '/summary',
+  path: '/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HistoryIndexRoute = HistoryIndexRouteImport.update({
+  id: '/history/',
+  path: '/history/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryLatencyRoute = HistoryLatencyRouteImport.update({
+  id: '/history/latency',
+  path: '/history/latency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistorySessionIdRoute = HistorySessionIdRouteImport.update({
+  id: '/history/$sessionId',
+  path: '/history/$sessionId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistorySessionIdLatencyRoute = HistorySessionIdLatencyRouteImport.update({
+  id: '/latency',
+  path: '/latency',
+  getParentRoute: () => HistorySessionIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/demo': typeof DemoRoute
+  '/summary': typeof SummaryRoute
+  '/upload': typeof UploadRoute
+  '/history/$sessionId': typeof HistorySessionIdRouteWithChildren
+  '/history/latency': typeof HistoryLatencyRoute
+  '/history/': typeof HistoryIndexRoute
+  '/history/$sessionId/latency': typeof HistorySessionIdLatencyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/demo': typeof DemoRoute
+  '/summary': typeof SummaryRoute
+  '/upload': typeof UploadRoute
+  '/history/$sessionId': typeof HistorySessionIdRouteWithChildren
+  '/history/latency': typeof HistoryLatencyRoute
+  '/history': typeof HistoryIndexRoute
+  '/history/$sessionId/latency': typeof HistorySessionIdLatencyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/demo': typeof DemoRoute
+  '/summary': typeof SummaryRoute
+  '/upload': typeof UploadRoute
+  '/history/$sessionId': typeof HistorySessionIdRouteWithChildren
+  '/history/latency': typeof HistoryLatencyRoute
+  '/history/': typeof HistoryIndexRoute
+  '/history/$sessionId/latency': typeof HistorySessionIdLatencyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/demo'
+    | '/summary'
+    | '/upload'
+    | '/history/$sessionId'
+    | '/history/latency'
+    | '/history/'
+    | '/history/$sessionId/latency'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/demo'
+    | '/summary'
+    | '/upload'
+    | '/history/$sessionId'
+    | '/history/latency'
+    | '/history'
+    | '/history/$sessionId/latency'
+  id:
+    | '__root__'
+    | '/'
+    | '/demo'
+    | '/summary'
+    | '/upload'
+    | '/history/$sessionId'
+    | '/history/latency'
+    | '/history/'
+    | '/history/$sessionId/latency'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DemoRoute: typeof DemoRoute
+  SummaryRoute: typeof SummaryRoute
+  UploadRoute: typeof UploadRoute
+  HistorySessionIdRoute: typeof HistorySessionIdRouteWithChildren
+  HistoryLatencyRoute: typeof HistoryLatencyRoute
+  HistoryIndexRoute: typeof HistoryIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/summary': {
+      id: '/summary'
+      path: '/summary'
+      fullPath: '/summary'
+      preLoaderRoute: typeof SummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +163,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/history/': {
+      id: '/history/'
+      path: '/history'
+      fullPath: '/history/'
+      preLoaderRoute: typeof HistoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history/latency': {
+      id: '/history/latency'
+      path: '/history/latency'
+      fullPath: '/history/latency'
+      preLoaderRoute: typeof HistoryLatencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history/$sessionId': {
+      id: '/history/$sessionId'
+      path: '/history/$sessionId'
+      fullPath: '/history/$sessionId'
+      preLoaderRoute: typeof HistorySessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history/$sessionId/latency': {
+      id: '/history/$sessionId/latency'
+      path: '/latency'
+      fullPath: '/history/$sessionId/latency'
+      preLoaderRoute: typeof HistorySessionIdLatencyRouteImport
+      parentRoute: typeof HistorySessionIdRoute
+    }
   }
 }
 
+interface HistorySessionIdRouteChildren {
+  HistorySessionIdLatencyRoute: typeof HistorySessionIdLatencyRoute
+}
+
+const HistorySessionIdRouteChildren: HistorySessionIdRouteChildren = {
+  HistorySessionIdLatencyRoute: HistorySessionIdLatencyRoute,
+}
+
+const HistorySessionIdRouteWithChildren =
+  HistorySessionIdRoute._addFileChildren(HistorySessionIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DemoRoute: DemoRoute,
+  SummaryRoute: SummaryRoute,
+  UploadRoute: UploadRoute,
+  HistorySessionIdRoute: HistorySessionIdRouteWithChildren,
+  HistoryLatencyRoute: HistoryLatencyRoute,
+  HistoryIndexRoute: HistoryIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

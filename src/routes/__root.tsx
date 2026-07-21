@@ -7,7 +7,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'Pulse Meet' },
+      { title: 'Pulse Live - Real-time Micro-Expression Analytics' },
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
   }),
@@ -25,10 +25,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="m-0 overflow-hidden font-sans antialiased">
+      <body className="m-0 bg-canvas text-ink min-h-screen font-sans antialiased">
         {children}
         <Scripts />
       </body>
     </html>
   )
 }
+
