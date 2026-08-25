@@ -1,8 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import { useGlobalLatencySummary } from '#/features/history/services/use-global-latency-summary'
-import { getErrorMessage } from '#/lib/api'
-import { Loader2, Activity, Zap, Database, Clock } from 'lucide-react'
+import { Activity, Zap, Database, Clock } from 'lucide-react'
 import { Card } from '#/components/ui/card'
+import { StatCard } from '#/components/stat-card'
+import { LabeledProgressBar } from '#/components/labeled-progress-bar'
+import { PageLoader } from '#/components/page-loader'
+import { QueryErrorState } from '#/components/query-error-state'
 
 interface PipelineStage {
   label: string
@@ -13,19 +16,9 @@ interface PipelineStage {
 export default function GlobalLatencyPage() {
   const { data, error, isPending } = useGlobalLatencySummary()
 
-  if (isPending)
-    return (
-      <div className="p-8 text-center text-ink flex items-center justify-center min-h-screen">
-        <Loader2 className="animate-spin w-6 h-6 text-brand-pink" />
-      </div>
-    )
+  if (isPending) return <PageLoader />
 
-  if (error)
-    return (
-      <div className="p-8 text-center text-brand-coral">
-        Error: {getErrorMessage(error)}
-      </div>
-    )
+  if (error) return <QueryErrorState error={error} />
 
   const {
     total_detections_analyzed: totalDetections,
@@ -83,19 +76,13 @@ export default function GlobalLatencyPage() {
         </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="p-8 flex items-center gap-6">
-            <div className="bg-brand-blue/10 p-4 rounded-full">
-              <Database className="w-8 h-8 text-brand-blue" />
-            </div>
-            <div>
-              <div className="text-muted-foreground mb-1 font-medium">
-                Total Deteksi Dianalisis
-              </div>
-              <div className="text-4xl font-bold text-ink">
-                {totalDetections}
-              </div>
-            </div>
-          </Card>
+          <StatCard
+            size="lg"
+            icon={Database}
+            iconClass="bg-brand-blue/10 text-brand-blue"
+            label="Total Deteksi Dianalisis"
+            value={String(totalDetections)}
+          />
 
           <Card className="p-8 flex items-center gap-6">
             <div className="bg-brand-coral/10 p-4 rounded-full">
@@ -123,25 +110,16 @@ export default function GlobalLatencyPage() {
 
           <div className="space-y-6 max-w-3xl">
             {stages.map((stage) => (
-              <div
+              <LabeledProgressBar
                 key={stage.label}
-                className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4"
-              >
-                <div className="w-40 text-sm font-medium text-muted-foreground">
-                  {stage.label}
-                </div>
-                <div className="flex-1 h-4 bg-surface-soft rounded-full overflow-hidden">
-                  <div
-                    className={`h-full transition-all duration-500 ${stage.barClass}`}
-                    style={{
-                      width: `${Math.min(100, (stage.value / averages.total_latency_ms) * 100)}%`,
-                    }}
-                  />
-                </div>
-                <div className="w-20 text-right text-sm font-mono font-bold">
-                  {stage.value.toFixed(2)}ms
-                </div>
-              </div>
+                layout="responsive"
+                labelWidth="md"
+                trackSize="md"
+                label={stage.label}
+                value={stage.value}
+                maxValue={averages.total_latency_ms}
+                barClass={stage.barClass}
+              />
             ))}
           </div>
         </Card>

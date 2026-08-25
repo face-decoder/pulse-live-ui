@@ -1,27 +1,18 @@
 import { Link } from '@tanstack/react-router'
 import { useHistorySessions } from '#/features/history/services/use-history-sessions'
-import { getErrorMessage } from '#/lib/api'
-import { ArrowRight, Activity, Loader2 } from 'lucide-react'
+import { ArrowRight, Activity } from 'lucide-react'
 import { Button } from '#/components/ui/button'
+import { PageLoader } from '#/components/page-loader'
+import { QueryErrorState } from '#/components/query-error-state'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 
 export default function HistoryPage() {
   const { data, error, isPending } = useHistorySessions()
   const sessions = data?.sessions ?? []
 
-  if (isPending)
-    return (
-      <div className="p-8 text-center text-ink flex items-center justify-center min-h-screen">
-        <Loader2 className="animate-spin w-6 h-6 text-brand-pink" />
-      </div>
-    )
+  if (isPending) return <PageLoader />
 
-  if (error)
-    return (
-      <div className="p-8 text-center text-brand-coral">
-        Error: {getErrorMessage(error)}
-      </div>
-    )
+  if (error) return <QueryErrorState error={error} />
 
   return (
     <div className="bg-canvas min-h-screen text-ink p-8">

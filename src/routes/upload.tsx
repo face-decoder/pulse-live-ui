@@ -3,10 +3,9 @@ import { useState, useRef, useMemo } from 'react'
 import { env } from '#/env'
 import { MotionTelemetryChart } from '#/features/micro-expression/components/motion-telemetry-chart'
 import { uploadFileOverWebSocket } from '#/lib/chunked-upload'
-import { formatStatusLabel, isHighAnxietyLabel } from '#/lib/detection'
 import type { PredictionResult, TelemetryChunk } from '#/types'
 import { Card, CardHeader, CardTitle } from '#/components/ui/card'
-import { Badge } from '#/components/ui/badge'
+import { DetectionLabelBadge } from '#/components/detection-label-badge'
 import {
   Table,
   TableBody,
@@ -25,7 +24,13 @@ interface RollingSummary {
   detected_phases?: Array<{ onset: number; apex: number; offset: number }>
 }
 
-type UploadStatus = 'idle' | 'uploading' | 'processing' | 'completed' | 'error'
+enum UploadStatus {
+  Idle = 'idle',
+  Uploading = 'uploading',
+  Processing = 'processing',
+  Completed = 'completed',
+  Error = 'error',
+}
 
 export const Route = createFileRoute('/upload')({
   component: VideoUploadRoute,
@@ -35,7 +40,7 @@ export const Route = createFileRoute('/upload')({
 function VideoUploadRoute() {
   const [predictions, setPredictions] = useState<PredictionResult[]>([])
   const [summary, setSummary] = useState<RollingSummary | null>(null)
-  const [status, setStatus] = useState<UploadStatus>('idle')
+  const [status, setStatus] = useState<UploadStatus>(UploadStatus.Idle)
   const wsRef = useRef<WebSocket | null>(null)
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +49,7 @@ function VideoUploadRoute() {
 
     setPredictions([])
     setSummary(null)
-    setStatus('uploading')
+    setStatus(UploadStatus.Uploading)
     const id = crypto.randomUUID()
 
     const ws = new WebSocket(`${env.VITE_SOCKET_URL}/video/${id}`)
@@ -52,8 +57,8 @@ function VideoUploadRoute() {
 
     ws.onopen = () => {
       uploadFileOverWebSocket(ws, file, {
-        onComplete: () => setStatus('processing'),
-        onError: () => setStatus('error'),
+        onComplete: () => setStatus(UploadStatus.Processing),
+        onError: () => setStatus(UploadStatus.Error),
       })
     }
 
@@ -76,9 +81,9 @@ function VideoUploadRoute() {
           data.type === 'status' &&
           (data as { status?: string }).status === 'completed'
         ) {
-          setStatus('completed')
+          setStatus(UploadStatus.Completed)
         } else if (data.type === 'error') {
-          setStatus('error')
+          setStatus(UploadStatus.Error)
         }
       } catch {}
     }
@@ -98,12 +103,12 @@ function VideoUploadRoute() {
     }))
   }, [summary, predictions])
 
-  const statusLabel: Record<UploadStatus, string> = {
-    idle: 'Idle',
-    uploading: 'Uploading...',
-    processing: 'Processing...',
-    completed: 'Completed',
-    error: 'Error',
+  const statusLabels: Record<UploadStatus, string> = {
+    [UploadStatus.Idle]: 'Idle',
+    [UploadStatus.Uploading]: 'Uploading...',
+    [UploadStatus.Processing]: 'Processing...',
+    [UploadStatus.Completed]: 'Completed',
+    [UploadStatus.Error]: 'Error',
   }
 
   return (
@@ -133,7 +138,7 @@ function VideoUploadRoute() {
             className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-on-primary hover:file:bg-brand-coral transition-colors"
           />
           <span className="font-mono text-sm text-muted-foreground">
-            {statusLabel[status]}
+            {statusLabels[status]}
           </span>
         </div>
 
@@ -198,15 +203,7 @@ function VideoUploadRoute() {
                     </TableCell>
                     <TableCell className="px-4">{p.latency_ms ?? 0}</TableCell>
                     <TableCell className="px-4">
-                      <Badge
-                        className={
-                          isHighAnxietyLabel(p.label)
-                            ? 'bg-brand-coral/20 text-brand-coral hover:bg-brand-coral/20'
-                            : 'bg-brand-mint/30 text-brand-teal hover:bg-brand-mint/30'
-                        }
-                      >
-                        {formatStatusLabel(p.label)}
-                      </Badge>
+                      <DetectionLabelBadge label={p.label} />
                     </TableCell>
                     <TableCell className="px-4 font-mono">
                       {p.confidence !== undefined

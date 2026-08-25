@@ -1,6 +1,7 @@
 import { CheckCircle, Loader } from 'lucide-react'
 import { Progress } from '#/components/ui/progress'
-import type { UploadProgressState, VideoStatus } from '#/types'
+import { VideoStatus  } from '#/types'
+import type {UploadProgressState} from '#/types';
 import { formatFileSize } from '#/lib/format'
 
 interface UploadProgressProps {
@@ -8,10 +9,10 @@ interface UploadProgressProps {
 }
 
 const statusLabels: Record<VideoStatus, string> = {
-  receiving: 'Uploading...',
-  received: 'Upload Complete',
-  processing: 'Processing...',
-  completed: 'Completed',
+  [VideoStatus.Receiving]: 'Uploading...',
+  [VideoStatus.Received]: 'Upload Complete',
+  [VideoStatus.Processing]: 'Processing...',
+  [VideoStatus.Completed]: 'Completed',
 }
 
 export function UploadProgress({ progress }: UploadProgressProps) {
@@ -19,7 +20,7 @@ export function UploadProgress({ progress }: UploadProgressProps) {
     <div className="w-full space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {progress.status === 'completed' ? (
+          {progress.status === VideoStatus.Completed ? (
             <CheckCircle className="w-5 h-5 text-brand-teal" />
           ) : (
             <Loader className="w-5 h-5 text-brand-peach animate-spin" />
@@ -49,7 +50,7 @@ export function UploadProgress({ progress }: UploadProgressProps) {
         </div>
       )}
 
-      {progress.statusMessage && progress.status === 'processing' && (
+      {progress.statusMessage && progress.status === VideoStatus.Processing && (
         <div className="text-sm text-brand-peach bg-brand-peach/10 p-2 rounded-md border border-brand-peach/20">
           {progress.statusMessage}
         </div>

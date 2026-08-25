@@ -1,15 +1,12 @@
 import { useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useCaptureSummary } from '#/features/summary/services/use-capture-summary'
-import { getErrorMessage } from '#/lib/api'
-import {
-  mergeSessionDetections,
-  formatStatusLabel,
-  isHighAnxietyLabel,
-} from '#/lib/detection'
+import { mergeSessionDetections } from '#/lib/detection'
 import { MotionTelemetryChart } from '#/features/micro-expression/components/motion-telemetry-chart'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import { Badge } from '#/components/ui/badge'
+import { DetectionLabelBadge } from '#/components/detection-label-badge'
+import { PageLoader } from '#/components/page-loader'
+import { QueryErrorState } from '#/components/query-error-state'
 import {
   Table,
   TableBody,
@@ -28,15 +25,9 @@ export default function SummaryPage() {
     [detections],
   )
 
-  if (isPending)
-    return <div className="p-8 text-center text-ink">Loading summary...</div>
+  if (isPending) return <PageLoader />
 
-  if (error)
-    return (
-      <div className="p-8 text-center text-brand-coral">
-        Error: {getErrorMessage(error)}
-      </div>
-    )
+  if (error) return <QueryErrorState error={error} />
 
   return (
     <div className="bg-canvas min-h-screen text-ink p-8">
@@ -88,15 +79,7 @@ export default function SummaryPage() {
                           {chunk.latency_ms ?? '-'}
                         </TableCell>
                         <TableCell className="px-4">
-                          <Badge
-                            className={
-                              isHighAnxietyLabel(chunk.label)
-                                ? 'bg-brand-coral/20 text-brand-coral hover:bg-brand-coral/20'
-                                : 'bg-brand-mint/30 text-brand-teal hover:bg-brand-mint/30'
-                            }
-                          >
-                            {formatStatusLabel(chunk.label)}
-                          </Badge>
+                          <DetectionLabelBadge label={chunk.label} />
                         </TableCell>
                         <TableCell className="px-4 font-mono">
                           {chunk.confidence !== undefined

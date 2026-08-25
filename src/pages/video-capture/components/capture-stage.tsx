@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react'
+import { cva } from 'class-variance-authority'
 import { MicOff } from 'lucide-react'
 import { MicroExpressionPredictionResultCard } from '#/features/micro-expression/components'
-import type { ConnectionStatus, PredictionResult } from '#/types'
+import { ConnectionStatus  } from '#/types'
+import type {PredictionResult} from '#/types';
+import { cn } from '#/lib/utils'
 
 interface CaptureStageProps {
   rtcStatus: ConnectionStatus
@@ -11,18 +14,22 @@ interface CaptureStageProps {
   children?: ReactNode
 }
 
-const statusColors: Record<ConnectionStatus, string> = {
-  connected: 'bg-brand-mint',
-  connecting: 'bg-brand-ochre animate-pulse',
-  disconnected: 'bg-brand-coral',
-  error: 'bg-brand-coral',
-}
+const statusColors = cva('h-2 w-2 rounded-full', {
+  variants: {
+    status: {
+      [ConnectionStatus.Connected]: 'bg-brand-mint',
+      [ConnectionStatus.Connecting]: 'bg-brand-ochre animate-pulse',
+      [ConnectionStatus.Disconnected]: 'bg-brand-coral',
+      [ConnectionStatus.Error]: 'bg-brand-coral',
+    },
+  },
+})
 
 const statusLabels: Record<ConnectionStatus, string> = {
-  connected: 'Live Server',
-  connecting: 'Connecting',
-  disconnected: 'Offline',
-  error: 'Offline',
+  [ConnectionStatus.Connected]: 'Live Server',
+  [ConnectionStatus.Connecting]: 'Connecting',
+  [ConnectionStatus.Disconnected]: 'Offline',
+  [ConnectionStatus.Error]: 'Offline',
 }
 
 export function CaptureStage({
@@ -47,7 +54,7 @@ export function CaptureStage({
       </div>
 
       <div className="absolute right-4 top-4 z-20 flex items-center gap-1.5 rounded-md bg-canvas/80 px-2.5 py-1 border border-hairline backdrop-blur-md shadow-sm">
-        <span className={`h-2 w-2 rounded-full ${statusColors[rtcStatus]}`} />
+        <span className={cn(statusColors({ status: rtcStatus }))} />
         <span className="text-[10px] font-bold text-ink uppercase tracking-wider">
           {statusLabels[rtcStatus]}
         </span>

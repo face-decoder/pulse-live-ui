@@ -1,11 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useWebSocket } from './use-web-socket'
-import type {
-  PredictionResult,
-  BBoxMessage,
-  AlertMessage,
-  ConnectionStatus,
-} from '#/types'
+import { useWebSocket, WebSocketStatus } from './use-web-socket'
+import { ConnectionStatus } from '#/types'
+import type { PredictionResult, BBoxMessage, AlertMessage } from '#/types'
 
 interface UseWebRTCOptions {
   url: string
@@ -22,7 +18,9 @@ export function useWebRTC({
   onBBox,
   onAlert,
 }: UseWebRTCOptions) {
-  const [status, setStatus] = useState<ConnectionStatus>('disconnected')
+  const [status, setStatus] = useState<ConnectionStatus>(
+    ConnectionStatus.Disconnected,
+  )
   const [error, setError] = useState<string | null>(null)
 
   const pcRef = useRef<RTCPeerConnection | null>(null)
@@ -44,7 +42,7 @@ export function useWebRTC({
               sdp: msg.sdp,
             }),
           )
-          setStatus('connected')
+          setStatus(ConnectionStatus.Connected)
         } else if (msg.type === 'candidate' && msg.candidate) {
           await pc.addIceCandidate(
             new RTCIceCandidate({
@@ -65,17 +63,18 @@ export function useWebRTC({
       }
     },
     onClose: () => {
-      setStatus('disconnected')
+      setStatus(ConnectionStatus.Disconnected)
     },
   })
 
   const negotiate = useCallback(async () => {
     const pc = pcRef.current
-    if (!pc || wsStatus !== 'open' || isNegotiatingRef.current) return
+    if (!pc || wsStatus !== WebSocketStatus.Open || isNegotiatingRef.current)
+      return
 
     try {
       isNegotiatingRef.current = true
-      setStatus('connecting')
+      setStatus(ConnectionStatus.Connecting)
 
       const offer = await pc.createOffer({
         offerToReceiveAudio: false,
@@ -93,14 +92,14 @@ export function useWebRTC({
     } catch (err) {
       console.error('Error during WebRTC negotiation:', err)
       setError('Failed to negotiate WebRTC connection.')
-      setStatus('disconnected')
+      setStatus(ConnectionStatus.Disconnected)
     } finally {
       isNegotiatingRef.current = false
     }
   }, [sendMessage, wsStatus])
 
   useEffect(() => {
-    if (wsStatus === 'open' && stream && !pcRef.current) {
+    if (wsStatus === WebSocketStatus.Open && stream && !pcRef.current) {
       const pc = new RTCPeerConnection({
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
       })
@@ -125,12 +124,12 @@ export function useWebRTC({
 
       pc.onconnectionstatechange = () => {
         if (pc.connectionState === 'connected') {
-          setStatus('connected')
+          setStatus(ConnectionStatus.Connected)
         } else if (
           pc.connectionState === 'disconnected' ||
           pc.connectionState === 'failed'
         ) {
-          setStatus('disconnected')
+          setStatus(ConnectionStatus.Disconnected)
         }
       }
 
@@ -147,7 +146,7 @@ export function useWebRTC({
         pcRef.current.close()
         pcRef.current = null
         activeStreamRef.current = null
-        setStatus('disconnected')
+        setStatus(ConnectionStatus.Disconnected)
       }
     }
   }, [stream, wsStatus, sendMessage, negotiate])

@@ -1,14 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { uploadFileOverWebSocket } from '#/lib/chunked-upload'
+import { UploadState, VideoStatus } from '#/types'
 import type { ServerMessage, UploadProgressState, UploadResult } from '#/types'
-
-type UploadState =
-  | 'idle'
-  | 'selecting'
-  | 'uploading'
-  | 'processing'
-  | 'completed'
-  | 'error'
 
 interface UseVideoUploadOptions {
   wsUrl?: string
@@ -26,13 +19,13 @@ export function useVideoUpload(options: UseVideoUploadOptions = {}) {
     onServerError,
   } = options
 
-  const [state, setState] = useState<UploadState>('idle')
+  const [state, setState] = useState<UploadState>(UploadState.Idle)
   const [file, setFile] = useState<File | null>(null)
   const [progress, setProgress] = useState<UploadProgressState>({
     bytesUploaded: 0,
     totalBytes: 0,
     percentage: 0,
-    status: 'receiving',
+    status: VideoStatus.Receiving,
   })
   const [result, setResult] = useState<UploadResult | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -72,8 +65,10 @@ export function useVideoUpload(options: UseVideoUploadOptions = {}) {
             statusMessage: message.message,
             bytesUploaded: message.bytes_received ?? prev.bytesUploaded,
           }))
-          if (message.status === 'processing') setState('processing')
-          if (message.status === 'completed') setState('completed')
+          if (message.status === VideoStatus.Processing)
+            setState(UploadState.Processing)
+          if (message.status === VideoStatus.Completed)
+            setState(UploadState.Completed)
           break
 
         case 'progress':
@@ -94,7 +89,7 @@ export function useVideoUpload(options: UseVideoUploadOptions = {}) {
         case 'error': {
           const errorMsg = message.message || 'Unknown server error'
           setError(errorMsg)
-          setState('error')
+          setState(UploadState.Error)
           onServerError?.(errorMsg)
           break
         }
@@ -125,7 +120,7 @@ export function useVideoUpload(options: UseVideoUploadOptions = {}) {
   const uploadFile = useCallback(
     async (selectedFile: File) => {
       try {
-        setState('uploading')
+        setState(UploadState.Uploading)
         setError(null)
         setResult(null)
         setFile(selectedFile)
@@ -144,13 +139,13 @@ export function useVideoUpload(options: UseVideoUploadOptions = {}) {
           },
           onError: (message) => {
             setError(message)
-            setState('error')
+            setState(UploadState.Error)
             ws.close()
           },
         })
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Upload failed')
-        setState('error')
+        setState(UploadState.Error)
         wsRef.current?.close()
       }
     },
@@ -160,13 +155,13 @@ export function useVideoUpload(options: UseVideoUploadOptions = {}) {
   const reset = useCallback(() => {
     wsRef.current?.close()
     wsRef.current = null
-    setState('idle')
+    setState(UploadState.Idle)
     setFile(null)
     setProgress({
       bytesUploaded: 0,
       totalBytes: 0,
       percentage: 0,
-      status: 'receiving',
+      status: VideoStatus.Receiving,
     })
     setResult(null)
     setError(null)

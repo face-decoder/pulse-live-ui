@@ -1,11 +1,13 @@
 import { useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useSessionLatencies } from '#/features/history/services/use-session-latencies'
-import { getErrorMessage } from '#/lib/api'
 import { computeLatencyStats } from '#/lib/detection'
-import { Loader2, Activity, Clock, Zap, Target } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { Activity, Clock, Zap, Target } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
+import { StatCard } from '#/components/stat-card'
+import { LabeledProgressBar } from '#/components/labeled-progress-bar'
+import { PageLoader } from '#/components/page-loader'
+import { QueryErrorState } from '#/components/query-error-state'
 import {
   Table,
   TableBody,
@@ -22,34 +24,31 @@ interface LatencyStage {
   barClass: string
 }
 
-interface LatencyKpi {
-  icon: LucideIcon
-  label: string
-  value: string
-  valueClass?: string
-}
-
-const kpis = (
-  stats: NonNullable<ReturnType<typeof computeLatencyStats>>,
-): LatencyKpi[] => [
+const kpis = (stats: NonNullable<ReturnType<typeof computeLatencyStats>>) => [
   {
     icon: Clock,
     label: 'Rata-Rata Latensi Total',
     value: `${stats.avgTotal} ms`,
+    tone: 'default' as const,
   },
   {
     icon: Zap,
     label: 'Latensi Maksimum',
     value: `${stats.maxTotal} ms`,
-    valueClass: 'text-brand-coral',
+    tone: 'coral' as const,
   },
   {
     icon: Target,
     label: 'Latensi Minimum',
     value: `${stats.minTotal} ms`,
-    valueClass: 'text-brand-mint',
+    tone: 'mint' as const,
   },
-  { icon: Activity, label: 'Total Deteksi', value: String(stats.count) },
+  {
+    icon: Activity,
+    label: 'Total Deteksi',
+    value: String(stats.count),
+    tone: 'default' as const,
+  },
 ]
 
 export default function HistoryLatencyPage({
@@ -98,19 +97,9 @@ export default function HistoryLatencyPage({
     ]
   }, [stats])
 
-  if (isPending)
-    return (
-      <div className="p-8 text-center text-ink flex items-center justify-center min-h-screen">
-        <Loader2 className="animate-spin w-6 h-6 text-brand-pink" />
-      </div>
-    )
+  if (isPending) return <PageLoader />
 
-  if (error)
-    return (
-      <div className="p-8 text-center text-brand-coral">
-        Error: {getErrorMessage(error)}
-      </div>
-    )
+  if (error) return <QueryErrorState error={error} />
 
   return (
     <div className="bg-canvas min-h-screen text-ink p-8">
@@ -141,16 +130,13 @@ export default function HistoryLatencyPage({
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {kpis(stats).map((kpi) => (
-                <Card key={kpi.label} className="p-6">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                    <kpi.icon className="w-4 h-4" /> <span>{kpi.label}</span>
-                  </div>
-                  <div
-                    className={`text-3xl font-bold text-ink ${kpi.valueClass ?? ''}`}
-                  >
-                    {kpi.value}
-                  </div>
-                </Card>
+                <StatCard
+                  key={kpi.label}
+                  icon={kpi.icon}
+                  label={kpi.label}
+                  value={kpi.value}
+                  tone={kpi.tone}
+                />
               ))}
             </div>
 
@@ -162,22 +148,13 @@ export default function HistoryLatencyPage({
               <CardContent className="px-0 pb-0">
                 <div className="space-y-4 max-w-2xl">
                   {stages.map((stage) => (
-                    <div key={stage.label} className="flex items-center gap-4">
-                      <div className="w-32 text-sm font-medium text-muted-foreground">
-                        {stage.label}
-                      </div>
-                      <div className="flex-1 h-3 bg-accent rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${stage.barClass}`}
-                          style={{
-                            width: `${Math.min(100, (parseFloat(stage.avgMs) / parseFloat(stage.avgTotal)) * 100)}%`,
-                          }}
-                        />
-                      </div>
-                      <div className="w-16 text-right text-sm font-mono">
-                        {stage.avgMs}ms
-                      </div>
-                    </div>
+                    <LabeledProgressBar
+                      key={stage.label}
+                      label={stage.label}
+                      value={parseFloat(stage.avgMs)}
+                      maxValue={parseFloat(stage.avgTotal)}
+                      barClass={stage.barClass}
+                    />
                   ))}
                 </div>
               </CardContent>

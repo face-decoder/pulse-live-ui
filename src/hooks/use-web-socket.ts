@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
-type WebSocketStatus = 'connecting' | 'open' | 'closing' | 'closed'
+export enum WebSocketStatus {
+  Connecting = 'connecting',
+  Open = 'open',
+  Closing = 'closing',
+  Closed = 'closed',
+}
 
 interface UseWebSocketOptions {
   onMessage?: (event: MessageEvent) => void
@@ -28,7 +33,7 @@ export function useWebSocket(
     reconnectInterval = 3000,
   } = options
 
-  const [status, setStatus] = useState<WebSocketStatus>('closed')
+  const [status, setStatus] = useState<WebSocketStatus>(WebSocketStatus.Closed)
   const [latestMessage, setLatestMessage] = useState<MessageEvent | null>(null)
   const [error, setError] = useState<Event | null>(null)
 
@@ -44,7 +49,7 @@ export function useWebSocket(
 
   const connect = useCallback(() => {
     try {
-      setStatus('connecting')
+      setStatus(WebSocketStatus.Connecting)
 
       const wsUrlStr = url.replace(/^http/, 'ws')
 
@@ -52,7 +57,7 @@ export function useWebSocket(
       wsRef.current = ws
 
       ws.onopen = (event) => {
-        setStatus('open')
+        setStatus(WebSocketStatus.Open)
         reconnectCountRef.current = 0
         callbacksRef.current.onOpen?.(event)
       }
@@ -68,7 +73,7 @@ export function useWebSocket(
       }
 
       ws.onclose = (event) => {
-        setStatus('closed')
+        setStatus(WebSocketStatus.Closed)
         callbacksRef.current.onClose?.(event)
 
         if (reconnect && reconnectCountRef.current < reconnectAttempts) {
@@ -79,7 +84,7 @@ export function useWebSocket(
         }
       }
     } catch {
-      setStatus('closed')
+      setStatus(WebSocketStatus.Closed)
     }
   }, [url, reconnect, reconnectAttempts, reconnectInterval])
 

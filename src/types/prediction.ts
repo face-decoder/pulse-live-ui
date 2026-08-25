@@ -40,7 +40,21 @@ export interface PredictionResult {
   latency_ms?: number
 }
 
-export type VideoStatus = 'receiving' | 'received' | 'processing' | 'completed'
+export enum VideoStatus {
+  Receiving = 'receiving',
+  Received = 'received',
+  Processing = 'processing',
+  Completed = 'completed',
+}
+
+export enum UploadState {
+  Idle = 'idle',
+  Selecting = 'selecting',
+  Uploading = 'uploading',
+  Processing = 'processing',
+  Completed = 'completed',
+  Error = 'error',
+}
 
 export interface BBoxMessage {
   type: 'bbox'

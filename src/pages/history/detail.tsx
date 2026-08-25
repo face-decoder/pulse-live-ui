@@ -1,17 +1,14 @@
 import { useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useSessionDetections } from '#/features/history/services/use-session-detections'
-import { getErrorMessage } from '#/lib/api'
-import {
-  mergeSessionDetections,
-  formatStatusLabel,
-  isHighAnxietyLabel,
-} from '#/lib/detection'
+import { mergeSessionDetections } from '#/lib/detection'
 import { MotionTelemetryChart } from '#/features/micro-expression/components/motion-telemetry-chart'
-import { Loader2, Activity } from 'lucide-react'
+import { Activity } from 'lucide-react'
 import { Button } from '#/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import { Badge } from '#/components/ui/badge'
+import { DetectionLabelBadge } from '#/components/detection-label-badge'
+import { PageLoader } from '#/components/page-loader'
+import { QueryErrorState } from '#/components/query-error-state'
 import {
   Table,
   TableBody,
@@ -34,19 +31,9 @@ export default function HistoryDetailPage({
     [detections],
   )
 
-  if (isPending)
-    return (
-      <div className="p-8 text-center text-ink flex items-center justify-center min-h-screen">
-        <Loader2 className="animate-spin w-6 h-6 text-brand-pink" />
-      </div>
-    )
+  if (isPending) return <PageLoader />
 
-  if (error)
-    return (
-      <div className="p-8 text-center text-brand-coral">
-        Error: {getErrorMessage(error)}
-      </div>
-    )
+  if (error) return <QueryErrorState error={error} />
 
   return (
     <div className="bg-canvas min-h-screen text-ink p-8">
@@ -117,15 +104,7 @@ export default function HistoryDetailPage({
                           {detection.latency_ms ?? '-'}
                         </TableCell>
                         <TableCell className="px-4">
-                          <Badge
-                            className={
-                              isHighAnxietyLabel(detection.label)
-                                ? 'bg-brand-coral/20 text-brand-coral hover:bg-brand-coral/20'
-                                : 'bg-brand-mint/30 text-brand-teal hover:bg-brand-mint/30'
-                            }
-                          >
-                            {formatStatusLabel(detection.label)}
-                          </Badge>
+                          <DetectionLabelBadge label={detection.label} />
                         </TableCell>
                         <TableCell className="px-4 font-mono">
                           {detection.confidence !== undefined

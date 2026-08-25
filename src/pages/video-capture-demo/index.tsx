@@ -13,6 +13,7 @@ import {
 import { useMediaStream } from '#/hooks/use-media-stream'
 import { useWebRTC } from '#/hooks/use-web-rtc'
 import { useSimulatedPrediction } from '#/features/video-capture/hooks/use-simulated-prediction'
+import { ConnectionStatus } from '#/types'
 import type { AlertMessage, PredictionResult } from '#/types'
 import {
   MicOff,
@@ -84,9 +85,9 @@ export default function VideoCaptureDemo() {
   if (isLoading) return <VideoCaptureLoader />
 
   const statusColor =
-    rtcStatus === 'connected'
+    rtcStatus === ConnectionStatus.Connected
       ? 'bg-brand-mint'
-      : rtcStatus === 'connecting'
+      : rtcStatus === ConnectionStatus.Connecting
         ? 'bg-brand-ochre animate-pulse'
         : 'bg-brand-coral'
 
@@ -130,9 +131,9 @@ export default function VideoCaptureDemo() {
             <div className="flex items-center gap-2 rounded-md border border-hairline bg-surface-soft/40 px-3 py-1.5 shadow-xs">
               <span className={`h-2.5 w-2.5 rounded-full ${statusColor}`} />
               <span className="text-[10px] font-bold text-ink uppercase tracking-wider">
-                {rtcStatus === 'connected'
+                {rtcStatus === ConnectionStatus.Connected
                   ? 'Server Stream Connected'
-                  : rtcStatus === 'connecting'
+                  : rtcStatus === ConnectionStatus.Connecting
                     ? 'Connecting Network'
                     : 'Stream Offline'}
               </span>
@@ -142,7 +143,7 @@ export default function VideoCaptureDemo() {
       </header>
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8 min-h-0">
-        <div className="flex-1 flex flex-col bg-surface-card border border-hairline rounded-xl shadow-md overflow-hidden min-h-[450px]">
+        <div className="flex-1 flex flex-col bg-surface-card border border-hairline rounded-xl shadow-md overflow-hidden min-h-112.5">
           <div className="h-11 border-b border-hairline bg-surface-soft/60 px-4 flex items-center justify-between">
             <div className="flex gap-1.5">
               <div className="w-3 h-3 rounded-full bg-brand-coral/40" />
@@ -241,7 +242,7 @@ export default function VideoCaptureDemo() {
               <p className="text-xs font-bold text-ink">
                 Telemetry Awaiting Input
               </p>
-              <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed max-w-[200px]">
+              <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed max-w-50">
                 Please turn on your camera stream. Once active, model results
                 will populate this panel instantly.
               </p>

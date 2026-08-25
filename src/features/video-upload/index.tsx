@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { AlertCircle, RotateCcw, Play } from 'lucide-react'
 import { useVideoUpload } from '#/hooks/use-video-upload'
+import { UploadState } from '#/types'
 import { Button } from '#/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '#/components/ui/alert'
@@ -62,7 +63,7 @@ export function VideoUploadFeature({ sessionId }: VideoUploadFeatureProps) {
         </Alert>
       )}
 
-      {state === 'idle' && !result && (
+      {state === UploadState.Idle && !result && (
         <Card>
           <CardContent>
             <VideoFileInput
@@ -87,7 +88,8 @@ export function VideoUploadFeature({ sessionId }: VideoUploadFeatureProps) {
         </Card>
       )}
 
-      {(state === 'uploading' || state === 'processing') && (
+      {(state === UploadState.Uploading ||
+        state === UploadState.Processing) && (
         <Card>
           <CardHeader>
             <CardTitle>Upload Progress</CardTitle>
@@ -128,7 +130,7 @@ export function VideoUploadFeature({ sessionId }: VideoUploadFeatureProps) {
         </div>
       )}
 
-      {state === 'idle' && !selectedFile && !result && (
+      {state === UploadState.Idle && !selectedFile && !result && (
         <div className="text-center text-muted-foreground py-8">
           <p className="text-sm">Select a video file to begin analysis</p>
         </div>
