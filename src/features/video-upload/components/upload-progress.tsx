@@ -1,7 +1,7 @@
 import { CheckCircle, Loader } from 'lucide-react'
 import { Progress } from '#/components/ui/progress'
-import { VideoStatus  } from '#/types'
-import type {UploadProgressState} from '#/types';
+import { VideoStatus } from '#/types'
+import type { UploadProgressState } from '#/types'
 import { formatFileSize } from '#/lib/format'
 
 interface UploadProgressProps {

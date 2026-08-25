@@ -13,6 +13,7 @@ custom hooks, dependency management, and effect cleanup.
 ## When to Use
 
 Use this skill when:
+
 - Reading promises or context with `use()`
 - Handling async form/mutation state with `useActionState`
 - Implementing optimistic UI with `useOptimistic`
@@ -136,6 +137,7 @@ function CreateUserForm() {
 ```
 
 **Key points:**
+
 - `action` goes directly on `<form action={...}>` — no `onSubmit` needed
 - `isPending` tracks async state automatically
 - `prevState` receives the previous returned value
@@ -250,7 +252,8 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       setStoredValue((prev) => {
-        const next = typeof value === 'function' ? (value as (p: T) => T)(prev) : value
+        const next =
+          typeof value === 'function' ? (value as (p: T) => T)(prev) : value
         localStorage.setItem(key, JSON.stringify(next))
         return next
       })
@@ -277,7 +280,7 @@ interface UseFormReturn<T> {
 }
 
 export function useForm<T extends Record<string, unknown>>(
-  initialValues: T
+  initialValues: T,
 ): UseFormReturn<T> {
   const [values, setValues] = useState<T>(initialValues)
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({})
@@ -295,7 +298,7 @@ export function useForm<T extends Record<string, unknown>>(
       e.preventDefault()
       onSubmit(values)
     },
-    [values]
+    [values],
   )
 
   const reset = useCallback(() => {
@@ -395,14 +398,14 @@ function Component({ onSave }: { onSave: (data: Data) => void }) {
 
 ### When NOT to Use `useEffect`
 
-| Anti-pattern                   | Right approach (React 19)             |
-| ------------------------------ | ------------------------------------- |
-| Fetching data on mount         | `use()` + Suspense, or TanStack Query |
-| Computing derived state        | Compute during render / `useMemo`     |
-| Reacting to user events        | Call logic directly in event handler  |
-| Resetting state on prop change | Derive from props, or use `key` prop  |
-| Syncing two states together    | Lift state up / single source of truth|
-| Form async submission          | `useActionState`                      |
+| Anti-pattern                   | Right approach (React 19)              |
+| ------------------------------ | -------------------------------------- |
+| Fetching data on mount         | `use()` + Suspense, or TanStack Query  |
+| Computing derived state        | Compute during render / `useMemo`      |
+| Reacting to user events        | Call logic directly in event handler   |
+| Resetting state on prop change | Derive from props, or use `key` prop   |
+| Syncing two states together    | Lift state up / single source of truth |
+| Form async submission          | `useActionState`                       |
 
 ### Effect Cleanup (Subscriptions)
 
@@ -471,10 +474,13 @@ const filteredData = useMemo(() => {
 
 ```typescript
 // ✅ Stable function for child components
-const handleSelect = useCallback((id: string) => {
-  setSelectedId(id)
-  onSelect?.(id)
-}, [onSelect])
+const handleSelect = useCallback(
+  (id: string) => {
+    setSelectedId(id)
+    onSelect?.(id)
+  },
+  [onSelect],
+)
 
 // ✅ Stable function for effects
 const fetchData = useCallback(async () => {

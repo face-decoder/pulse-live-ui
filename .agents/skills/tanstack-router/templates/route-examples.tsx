@@ -14,7 +14,9 @@ export const Route = createRootRoute({
   component: () => (
     <>
       <nav>
-        <Link to="/" activeProps={{ className: 'font-bold' }}>Home</Link>
+        <Link to="/" activeProps={{ className: 'font-bold' }}>
+          Home
+        </Link>
         <Link to="/about">About</Link>
         <Link to="/posts">Posts</Link>
       </nav>
@@ -46,7 +48,9 @@ function HomePage() {
 export const Route = createFileRoute('/posts/$postId')({
   loader: async ({ params }) => {
     // Fully typed params!
-    const post = await fetch(`/api/posts/${params.postId}`).then(r => r.json())
+    const post = await fetch(`/api/posts/${params.postId}`).then((r) =>
+      r.json(),
+    )
     return { post }
   },
   component: PostPage,
@@ -72,7 +76,7 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 
 const postsQueryOptions = queryOptions({
   queryKey: ['posts'],
-  queryFn: async () => fetch('/api/posts').then(r => r.json()),
+  queryFn: async () => fetch('/api/posts').then((r) => r.json()),
 })
 
 export const Route = createFileRoute('/posts/')({
@@ -87,7 +91,7 @@ function PostsListPage() {
   return (
     <div>
       <h1>Posts</h1>
-      {posts.map(post => (
+      {posts.map((post) => (
         <Link key={post.id} to="/posts/$postId" params={{ postId: post.id }}>
           {post.title}
         </Link>

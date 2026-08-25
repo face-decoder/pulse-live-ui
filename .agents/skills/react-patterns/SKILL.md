@@ -12,6 +12,7 @@ Modern React 19 patterns leveraging the React Compiler, Server Actions, and new 
 The React Compiler automatically optimizes components for performance. Write code that works well with it:
 
 **Best Practices:**
+
 - Keep components pure and props serializable
 - Derive values during render (don't stash in refs unnecessarily)
 - Keep event handlers inline unless they close over large mutable objects
@@ -19,6 +20,7 @@ The React Compiler automatically optimizes components for performance. Write cod
 - Opt-out problematic components with `"use no memo"` while refactoring
 
 **Example - Pure Component:**
+
 ```typescript
 // ✅ Compiler-friendly - pure function
 function UserCard({ user }: { user: User }) {
@@ -46,11 +48,13 @@ function UserCard({ user }: { user: User }) {
 ```
 
 **Verification:**
+
 - Open React DevTools
 - Look for "Memo ✨" badge on components
 - If missing, component wasn't optimized (check for violations)
 
 **Opt-Out When Needed:**
+
 ```typescript
 'use no memo'
 
@@ -63,6 +67,7 @@ function ProblematicComponent() {
 ## Actions & Forms
 
 For SPA mutations, choose **one approach per feature**:
+
 - **React 19 Actions:** `<form action={fn}>`, `useActionState`, `useOptimistic`
 - **TanStack Query:** `useMutation`
 
@@ -71,11 +76,13 @@ Don't duplicate logic between both approaches.
 ### React 19 Actions (Form-Centric)
 
 **Best for:**
+
 - Form submissions
 - Simple CRUD operations
 - When you want form validation built-in
 
 **Basic Action:**
+
 ```typescript
 'use server' // Only if using SSR/RSC, omit for SPA
 
@@ -106,6 +113,7 @@ function TodoForm() {
 ```
 
 **With State (useActionState):**
+
 ```typescript
 import { useActionState } from 'react'
 
@@ -128,6 +136,7 @@ function TodoForm() {
 ```
 
 **With Optimistic Updates (useOptimistic):**
+
 ```typescript
 import { useOptimistic } from 'react'
 
@@ -168,6 +177,7 @@ function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
 ### TanStack Query Mutations (Preferred for SPAs)
 
 **Best for:**
+
 - Non-form mutations (e.g., button clicks)
 - Complex optimistic updates with rollback
 - Integration with existing Query cache
@@ -176,6 +186,7 @@ function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
 See **tanstack-query** skill for comprehensive mutation patterns.
 
 **Quick Example:**
+
 ```typescript
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
@@ -216,6 +227,7 @@ function TodoForm() {
 The `use` hook unwraps Promises and Context, enabling new patterns.
 
 **With Promises:**
+
 ```typescript
 import { use, Suspense } from 'react'
 
@@ -238,6 +250,7 @@ function App() {
 ```
 
 **With Context:**
+
 ```typescript
 import { use, createContext } from 'react'
 
@@ -250,6 +263,7 @@ function Button() {
 ```
 
 **When to Use:**
+
 - Primarily useful with Suspense/data primitives and RSC (React Server Components)
 - **For SPA-only apps**, prefer **TanStack Query + Router loaders** for data fetching
 - `use` shines when you already have a Promise from a parent component
@@ -257,6 +271,7 @@ function Button() {
 ## Component Composition Patterns
 
 **Compound Components:**
+
 ```typescript
 // ✅ Good - composable, flexible
 <Card>
@@ -287,6 +302,7 @@ Card.Content = function CardContent({ children }: { children: React.ReactNode })
 ```
 
 **Render Props (when needed):**
+
 ```typescript
 function DataLoader<T>({
   fetch,
@@ -346,6 +362,7 @@ class ErrorBoundary extends Component<
 ```
 
 **Or use react-error-boundary library:**
+
 ```typescript
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -359,15 +376,15 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 ## Decision Guide: Actions vs Query Mutations
 
-| Scenario | Recommendation |
-|----------|---------------|
-| Form submission with validation | React Actions |
-| Button click mutation | TanStack Query |
+| Scenario                            | Recommendation |
+| ----------------------------------- | -------------- |
+| Form submission with validation     | React Actions  |
+| Button click mutation               | TanStack Query |
 | Needs optimistic updates + rollback | TanStack Query |
-| Integrates with existing cache | TanStack Query |
-| SSR/RSC application | React Actions |
-| SPA with complex data flow | TanStack Query |
-| Simple CRUD with forms | React Actions |
+| Integrates with existing cache      | TanStack Query |
+| SSR/RSC application                 | React Actions  |
+| SPA with complex data flow          | TanStack Query |
+| Simple CRUD with forms              | React Actions  |
 
 **Rule of Thumb:** For SPAs with TanStack Query already in use, prefer Query mutations for consistency. Only use Actions for form-heavy features where the form-centric API is beneficial.
 

@@ -23,6 +23,7 @@ src/
 ```
 
 Inside `features/[feature-name]/`:
+
 ```text
 features/[feature-name]/
   ├── api/             # API request functions / React Query hooks specific to feature
@@ -72,7 +73,9 @@ export interface UseMyCustomLogicReturn {
   toggle: () => void
 }
 
-export function useMyCustomLogic(initialState: boolean = false): UseMyCustomLogicReturn {
+export function useMyCustomLogic(
+  initialState: boolean = false,
+): UseMyCustomLogicReturn {
   const [isActive, setIsActive] = useState(initialState)
 
   const toggle = useCallback(() => {
@@ -146,7 +149,8 @@ interface AppState {
 export const useAppStore = create<AppState>((set) => ({
   theme: 'light',
   setTheme: (theme) => set({ theme }),
-  toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
+  toggleTheme: () =>
+    set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
 }))
 ```
 
@@ -155,12 +159,15 @@ export const useAppStore = create<AppState>((set) => ({
 ```typescript
 /**
  * Formats a given number into a currency string representation.
- * 
+ *
  * @param value The raw numerical value
  * @param currency The currency code (default: 'IDR')
  * @returns Formatted currency string
  */
-export function formatCurrency(value: number, currency: string = 'IDR'): string {
+export function formatCurrency(
+  value: number,
+  currency: string = 'IDR',
+): string {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency,
@@ -173,8 +180,8 @@ export function formatCurrency(value: number, currency: string = 'IDR'): string 
 
 ## 💡 Rules & Conventions
 
-1. **Exports**: Prefer named exports for functions, hooks, and utilities. Use default export OR named export for React components depending on the project style (usually default export for pages/routes, named exports for UI components, but be consistent with existing files). 
-2. **File Naming**: 
+1. **Exports**: Prefer named exports for functions, hooks, and utilities. Use default export OR named export for React components depending on the project style (usually default export for pages/routes, named exports for UI components, but be consistent with existing files).
+2. **File Naming**:
    - Components & Hooks: `kebab-case.tsx` or `kebab-case.ts` (e.g., `user-profile.tsx`, `use-auth.ts`)
    - Interfaces & Types: Put in `types.ts` or `[feature].types.ts`
 3. **Imports**: Prefer absolute imports (`@/...`) over complex relative paths (`../../..`).

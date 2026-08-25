@@ -3,21 +3,27 @@
 ## use() Hook
 
 ```tsx
-import { use, Suspense } from 'react';
+import { use, Suspense } from 'react'
 
 // Read promises in render
-function Comments({ commentsPromise }: { commentsPromise: Promise<Comment[]> }) {
-  const comments = use(commentsPromise);
+function Comments({
+  commentsPromise,
+}: {
+  commentsPromise: Promise<Comment[]>
+}) {
+  const comments = use(commentsPromise)
   return (
     <ul>
-      {comments.map(c => <li key={c.id}>{c.text}</li>)}
+      {comments.map((c) => (
+        <li key={c.id}>{c.text}</li>
+      ))}
     </ul>
-  );
+  )
 }
 
 // Parent creates promise, child reads it
 function Post({ postId }: { postId: string }) {
-  const commentsPromise = fetchComments(postId);
+  const commentsPromise = fetchComments(postId)
 
   return (
     <article>
@@ -26,44 +32,47 @@ function Post({ postId }: { postId: string }) {
         <Comments commentsPromise={commentsPromise} />
       </Suspense>
     </article>
-  );
+  )
 }
 
 // Read context conditionally
 function Theme({ children }: { children: React.ReactNode }) {
   if (someCondition) {
-    const theme = use(ThemeContext);
-    return <div className={theme}>{children}</div>;
+    const theme = use(ThemeContext)
+    return <div className={theme}>{children}</div>
   }
-  return children;
+  return children
 }
 ```
 
 ## useActionState
 
 ```tsx
-'use client';
-import { useActionState } from 'react';
+'use client'
+import { useActionState } from 'react'
 
 interface FormState {
-  error?: string;
-  success?: boolean;
+  error?: string
+  success?: boolean
 }
 
-async function submitAction(prevState: FormState, formData: FormData): Promise<FormState> {
-  'use server';
-  const email = formData.get('email') as string;
+async function submitAction(
+  prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  'use server'
+  const email = formData.get('email') as string
 
   try {
-    await subscribe(email);
-    return { success: true };
+    await subscribe(email)
+    return { success: true }
   } catch {
-    return { error: 'Failed to subscribe' };
+    return { error: 'Failed to subscribe' }
   }
 }
 
 function NewsletterForm() {
-  const [state, formAction, isPending] = useActionState(submitAction, {});
+  const [state, formAction, isPending] = useActionState(submitAction, {})
 
   return (
     <form action={formAction}>
@@ -74,24 +83,24 @@ function NewsletterForm() {
       {state.error && <p className="error">{state.error}</p>}
       {state.success && <p className="success">Subscribed!</p>}
     </form>
-  );
+  )
 }
 ```
 
 ## useFormStatus
 
 ```tsx
-'use client';
-import { useFormStatus } from 'react-dom';
+'use client'
+import { useFormStatus } from 'react-dom'
 
 function SubmitButton() {
-  const { pending, data, method, action } = useFormStatus();
+  const { pending, data, method, action } = useFormStatus()
 
   return (
     <button type="submit" disabled={pending}>
       {pending ? 'Submitting...' : 'Submit'}
     </button>
-  );
+  )
 }
 
 // Must be used inside a <form>
@@ -101,36 +110,36 @@ function ContactForm() {
       <input name="message" />
       <SubmitButton />
     </form>
-  );
+  )
 }
 ```
 
 ## useOptimistic
 
 ```tsx
-'use client';
-import { useOptimistic } from 'react';
+'use client'
+import { useOptimistic } from 'react'
 
 function TodoList({ todos }: { todos: Todo[] }) {
   const [optimisticTodos, addOptimisticTodo] = useOptimistic(
     todos,
-    (state, newTodo: Todo) => [...state, newTodo]
-  );
+    (state, newTodo: Todo) => [...state, newTodo],
+  )
 
   async function addTodo(formData: FormData) {
-    const text = formData.get('text') as string;
+    const text = formData.get('text') as string
 
     // Immediately update UI
-    addOptimisticTodo({ id: 'temp', text, completed: false });
+    addOptimisticTodo({ id: 'temp', text, completed: false })
 
     // Then persist
-    await createTodo(text);
+    await createTodo(text)
   }
 
   return (
     <>
       <ul>
-        {optimisticTodos.map(todo => (
+        {optimisticTodos.map((todo) => (
           <li key={todo.id}>{todo.text}</li>
         ))}
       </ul>
@@ -139,7 +148,7 @@ function TodoList({ todos }: { todos: Todo[] }) {
         <button>Add</button>
       </form>
     </>
-  );
+  )
 }
 ```
 
@@ -148,27 +157,27 @@ function TodoList({ todos }: { todos: Todo[] }) {
 ```tsx
 // React 19: ref is just a prop
 function Input({ ref, ...props }: { ref?: React.Ref<HTMLInputElement> }) {
-  return <input ref={ref} {...props} />;
+  return <input ref={ref} {...props} />
 }
 
 // No need for forwardRef anymore
 function Form() {
-  const inputRef = useRef<HTMLInputElement>(null);
-  return <Input ref={inputRef} placeholder="Enter text" />;
+  const inputRef = useRef<HTMLInputElement>(null)
+  return <Input ref={inputRef} placeholder="Enter text" />
 }
 ```
 
 ## Quick Reference
 
-| Hook | Purpose |
-|------|---------|
-| `use()` | Read promise/context in render |
-| `useActionState()` | Form action state + pending |
-| `useFormStatus()` | Form pending state (child) |
-| `useOptimistic()` | Optimistic UI updates |
+| Hook               | Purpose                        |
+| ------------------ | ------------------------------ |
+| `use()`            | Read promise/context in render |
+| `useActionState()` | Form action state + pending    |
+| `useFormStatus()`  | Form pending state (child)     |
+| `useOptimistic()`  | Optimistic UI updates          |
 
-| Pattern | When |
-|---------|------|
-| `use(promise)` | Suspense data fetching |
-| `use(context)` | Conditional context read |
+| Pattern          | When                      |
+| ---------------- | ------------------------- |
+| `use(promise)`   | Suspense data fetching    |
+| `use(context)`   | Conditional context read  |
 | `useActionState` | Server Actions with state |

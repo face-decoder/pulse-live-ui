@@ -1,5 +1,5 @@
-import { cva  } from 'class-variance-authority'
-import type {VariantProps} from 'class-variance-authority';
+import { cva } from 'class-variance-authority'
+import type { VariantProps } from 'class-variance-authority'
 import { Badge } from '#/components/ui/badge'
 import { cn } from '#/lib/utils'
 import { formatStatusLabel, isHighAnxietyLabel } from '#/lib/detection'

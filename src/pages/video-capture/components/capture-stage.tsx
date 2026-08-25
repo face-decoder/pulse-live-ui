@@ -2,8 +2,8 @@ import type { ReactNode } from 'react'
 import { cva } from 'class-variance-authority'
 import { MicOff } from 'lucide-react'
 import { MicroExpressionPredictionResultCard } from '#/features/micro-expression/components'
-import { ConnectionStatus  } from '#/types'
-import type {PredictionResult} from '#/types';
+import { ConnectionStatus } from '#/types'
+import type { PredictionResult } from '#/types'
 import { cn } from '#/lib/utils'
 
 interface CaptureStageProps {

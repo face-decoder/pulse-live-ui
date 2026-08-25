@@ -36,6 +36,7 @@ Build type-safe, file-based routing for React SPAs with TanStack Router, optimiz
 ## When to Use This Skill
 
 **Auto-triggers when you mention:**
+
 - "TanStack Router" or "type-safe routing"
 - "file-based routing" or "route configuration"
 - "React routing" with TypeScript emphasis
@@ -43,6 +44,7 @@ Build type-safe, file-based routing for React SPAs with TanStack Router, optimiz
 - "Cloudflare Workers routing"
 
 **Use this skill when:**
+
 - Building SPAs with type-safe navigation
 - Implementing file-based routing (like Next.js)
 - Need route-level data loading
@@ -184,6 +186,7 @@ export const Route = createFileRoute('/posts/$postId')({
 **Problem:** Build fails with `@tanstack/router-devtools-core` not found.
 
 **Solution:**
+
 ```bash
 bun add @tanstack/router-devtools
 ```
@@ -193,6 +196,7 @@ bun add @tanstack/router-devtools
 **Problem:** Routes not auto-generated.
 
 **Solution:** TanStackRouterVite MUST come before react():
+
 ```typescript
 plugins: [
   TanStackRouterVite(), // First!
@@ -205,6 +209,7 @@ plugins: [
 **Problem:** `Link to` not typed.
 
 **Solution:**
+
 ```typescript
 // src/routeTree.gen.ts is auto-generated
 // Import it in main.tsx to register types
@@ -216,6 +221,7 @@ import { routeTree } from './routeTree.gen'
 **Problem:** Loader function not called on navigation.
 
 **Solution:** Ensure route exports `Route`:
+
 ```typescript
 export const Route = createFileRoute('/path')({ loader: ... })
 ```
@@ -238,11 +244,7 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import { cloudflare } from '@cloudflare/vite-plugin'
 
 export default defineConfig({
-  plugins: [
-    TanStackRouterVite(),
-    react(),
-    cloudflare(),
-  ],
+  plugins: [TanStackRouterVite(), react(), cloudflare()],
 })
 ```
 
@@ -258,7 +260,7 @@ export async function onRequestGet({ env }) {
 // Client-side route
 export const Route = createFileRoute('/posts')({
   loader: async () => {
-    const posts = await fetch('/api/posts').then(r => r.json())
+    const posts = await fetch('/api/posts').then((r) => r.json())
     return { posts }
   },
 })
@@ -296,6 +298,7 @@ Deep-dive guides in `~/.claude/skills/tanstack-router/references/`:
 ## Integration with Existing Skills
 
 **Works with:**
+
 - **tanstack-query** - Recommended for data fetching
 - **tanstack-table** - Display data from routes
 - **cloudflare-worker-base** - API backend
@@ -314,11 +317,13 @@ Deep-dive guides in `~/.claude/skills/tanstack-router/references/`:
 ## Production Validation
 
 **Tested with:**
+
 - React 19.2, Vite 6.0, TypeScript 5.8
 - Cloudflare Workers (Wrangler 4.0)
 - TanStack Query v5.90.7
 
 **Stack compatibility:**
+
 - ✅ Cloudflare Workers + Static Assets
 - ✅ TanStack Query integration
 - ✅ TypeScript strict mode

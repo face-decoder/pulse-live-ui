@@ -5,6 +5,7 @@
 **Symptom:** Build error: Cannot find module '@tanstack/router-devtools-core'
 
 **Solution:**
+
 ```bash
 npm install @tanstack/router-devtools
 ```
@@ -14,6 +15,7 @@ npm install @tanstack/router-devtools
 **Symptom:** `routeTree.gen.ts` not created, type errors
 
 **Solution:** Vite plugin MUST come before react():
+
 ```typescript
 // vite.config.ts
 plugins: [
@@ -27,6 +29,7 @@ plugins: [
 **Symptom:** No autocomplete for routes
 
 **Solution:** Import and use the generated routeTree:
+
 ```typescript
 import { routeTree } from './routeTree.gen'
 const router = createRouter({ routeTree })
@@ -37,9 +40,12 @@ const router = createRouter({ routeTree })
 **Symptom:** Data not loaded on navigation
 
 **Solution:** Ensure route exports `Route`:
+
 ```typescript
 export const Route = createFileRoute('/path')({
-  loader: async () => { /* ... */ }
+  loader: async () => {
+    /* ... */
+  },
 })
 ```
 
