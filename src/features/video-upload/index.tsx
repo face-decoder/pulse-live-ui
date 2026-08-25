@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { AlertCircle, RotateCcw, Play } from 'lucide-react'
 import { useVideoUpload } from '#/hooks/use-video-upload'
 import {
@@ -12,15 +12,23 @@ interface VideoUploadFeatureProps {
 }
 
 export function VideoUploadFeature({ sessionId }: VideoUploadFeatureProps) {
-  const { state, file: uploadedFile, progress, result, error, uploadFile, reset } = useVideoUpload({
-    sessionId,
-  })
+  const handleServerError = useCallback(() => {
+    window.setTimeout(() => {
+      window.location.reload()
+    }, 3000)
+  }, [])
+
+  const {
+    state,
+    file: uploadedFile,
+    progress,
+    result,
+    error,
+    uploadFile,
+    reset,
+  } = useVideoUpload({ sessionId, onServerError: handleServerError })
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-
-  const handleFileSelect = (fileArg: File) => {
-    setSelectedFile(fileArg)
-  }
 
   const handleStartUpload = () => {
     if (selectedFile) {
@@ -35,7 +43,6 @@ export function VideoUploadFeature({ sessionId }: VideoUploadFeatureProps) {
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
-      {/* Error Alert */}
       {error && (
         <div className="flex items-start gap-3 p-4 bg-brand-coral/10 border border-brand-coral/20 rounded-lg">
           <AlertCircle className="w-5 h-5 text-brand-coral flex-shrink-0 mt-0.5" />
@@ -49,12 +56,10 @@ export function VideoUploadFeature({ sessionId }: VideoUploadFeatureProps) {
         </div>
       )}
 
-      {/* File Input Section */}
       {state === 'idle' && !result && (
         <div className="bg-surface-card p-6 rounded-lg border border-hairline">
           <VideoFileInput
-            onFileSelect={handleFileSelect}
-            disabled={false}
+            onFileSelect={setSelectedFile}
             selectedFile={selectedFile}
           />
 
@@ -62,7 +67,6 @@ export function VideoUploadFeature({ sessionId }: VideoUploadFeatureProps) {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleStartUpload}
-                disabled={!selectedFile}
                 className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-md hover:bg-brand-coral disabled:bg-muted-soft disabled:cursor-not-allowed disabled:text-muted transition-colors font-medium text-sm"
               >
                 <Play className="w-4 h-4" />
@@ -79,27 +83,32 @@ export function VideoUploadFeature({ sessionId }: VideoUploadFeatureProps) {
         </div>
       )}
 
-      {/* Progress Section */}
       {(state === 'uploading' || state === 'processing') && (
         <div className="bg-surface-card p-6 rounded-lg border border-hairline">
-          <h2 className="text-lg font-semibold text-ink mb-4">Upload Progress</h2>
+          <h2 className="text-lg font-semibold text-ink mb-4">
+            Upload Progress
+          </h2>
           <UploadProgress progress={progress} />
 
           {uploadedFile && (
             <div className="mt-4 text-sm text-muted bg-surface-soft p-3 rounded">
               <p>
-                File: <span className="font-medium text-ink">{uploadedFile.name}</span>
+                File:{' '}
+                <span className="font-medium text-ink">
+                  {uploadedFile.name}
+                </span>
               </p>
             </div>
           )}
         </div>
       )}
 
-      {/* Results Section */}
       {result?.prediction && (
         <div className="space-y-4">
           <div className="bg-surface-card p-6 rounded-lg border border-hairline">
-            <h2 className="text-lg font-semibold text-ink mb-4">Analysis Results</h2>
+            <h2 className="text-lg font-semibold text-ink mb-4">
+              Analysis Results
+            </h2>
             <VideoUploadResults result={result.prediction} />
           </div>
 
@@ -113,7 +122,6 @@ export function VideoUploadFeature({ sessionId }: VideoUploadFeatureProps) {
         </div>
       )}
 
-      {/* Empty State */}
       {state === 'idle' && !selectedFile && !result && (
         <div className="text-center text-muted py-8">
           <p className="text-sm">Select a video file to begin analysis</p>

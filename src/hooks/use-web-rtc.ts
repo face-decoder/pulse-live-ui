@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useWebSocket } from './use-web-socket'
-import type { PredictionResult, BBoxMessage, AlertMessage } from '#/types'
-import { ConnectionStatus } from '#/types/rtc'
+import type {
+  PredictionResult,
+  BBoxMessage,
+  AlertMessage,
+  ConnectionStatus,
+} from '#/types'
 
 interface UseWebRTCOptions {
   url: string
@@ -11,16 +15,20 @@ interface UseWebRTCOptions {
   onAlert?: (alert: AlertMessage) => void
 }
 
-export function useWebRTC({ url, stream, onPrediction, onBBox, onAlert }: UseWebRTCOptions) {
-  // prettier-ignore
-  const [status, setStatus] = useState<ConnectionStatus>(ConnectionStatus.DISCONNECTED)
+export function useWebRTC({
+  url,
+  stream,
+  onPrediction,
+  onBBox,
+  onAlert,
+}: UseWebRTCOptions) {
+  const [status, setStatus] = useState<ConnectionStatus>('disconnected')
   const [error, setError] = useState<string | null>(null)
 
   const pcRef = useRef<RTCPeerConnection | null>(null)
   const isNegotiatingRef = useRef(false)
   const activeStreamRef = useRef<MediaStream | null>(null)
 
-  // Use the existing WebSocket hook for signaling
   const { sendMessage, status: wsStatus } = useWebSocket(url, {
     onMessage: async (event) => {
       try {
@@ -36,7 +44,7 @@ export function useWebRTC({ url, stream, onPrediction, onBBox, onAlert }: UseWeb
               sdp: msg.sdp,
             }),
           )
-          setStatus(ConnectionStatus.CONNECTED)
+          setStatus('connected')
         } else if (msg.type === 'candidate' && msg.candidate) {
           await pc.addIceCandidate(
             new RTCIceCandidate({
@@ -46,26 +54,18 @@ export function useWebRTC({ url, stream, onPrediction, onBBox, onAlert }: UseWeb
             }),
           )
         } else if (msg.type === 'prediction' || msg.type === 'error') {
-          if (onPrediction) {
-            onPrediction(msg)
-          }
+          onPrediction?.(msg)
         } else if (msg.type === 'bbox') {
-          if (onBBox) {
-            onBBox(msg)
-          }
+          onBBox?.(msg)
         } else if (msg.type === 'alert') {
-          if (onAlert) {
-            onAlert(msg)
-          }
-        } else if (msg.type === 'heartbeat') {
-          // ignore heartbeat
+          onAlert?.(msg)
         }
       } catch (err) {
         console.error('Error handling WebRTC message:', err)
       }
     },
     onClose: () => {
-      setStatus(ConnectionStatus.DISCONNECTED)
+      setStatus('disconnected')
     },
   })
 
@@ -75,7 +75,7 @@ export function useWebRTC({ url, stream, onPrediction, onBBox, onAlert }: UseWeb
 
     try {
       isNegotiatingRef.current = true
-      setStatus(ConnectionStatus.CONNECTING)
+      setStatus('connecting')
 
       const offer = await pc.createOffer({
         offerToReceiveAudio: false,
@@ -93,7 +93,7 @@ export function useWebRTC({ url, stream, onPrediction, onBBox, onAlert }: UseWeb
     } catch (err) {
       console.error('Error during WebRTC negotiation:', err)
       setError('Failed to negotiate WebRTC connection.')
-      setStatus(ConnectionStatus.DISCONNECTED)
+      setStatus('disconnected')
     } finally {
       isNegotiatingRef.current = false
     }
@@ -125,32 +125,29 @@ export function useWebRTC({ url, stream, onPrediction, onBBox, onAlert }: UseWeb
 
       pc.onconnectionstatechange = () => {
         if (pc.connectionState === 'connected') {
-          setStatus(ConnectionStatus.CONNECTED)
+          setStatus('connected')
         } else if (
           pc.connectionState === 'disconnected' ||
           pc.connectionState === 'failed'
         ) {
-          setStatus(ConnectionStatus.DISCONNECTED)
+          setStatus('disconnected')
         }
       }
 
-      // Add all tracks from the stream
       stream.getTracks().forEach((track) => {
         pc.addTrack(track, stream)
       })
 
-      // Initiate negotiation
       void negotiate()
     }
 
     return () => {
-      // If stream changes or unmounts, we should clean up the peer connection
       if (pcRef.current && activeStreamRef.current !== stream) {
         sendMessage(JSON.stringify({ type: 'stop' }))
         pcRef.current.close()
         pcRef.current = null
         activeStreamRef.current = null
-        setStatus(ConnectionStatus.DISCONNECTED)
+        setStatus('disconnected')
       }
     }
   }, [stream, wsStatus, sendMessage, negotiate])

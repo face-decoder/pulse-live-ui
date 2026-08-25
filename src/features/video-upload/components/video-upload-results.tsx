@@ -25,24 +25,30 @@ export function VideoUploadResults({ result }: VideoUploadResultsProps) {
 
   return (
     <div className="w-full space-y-6">
-      {/* Prediction Header */}
-      <div className={`p-6 rounded-lg border border-hairline ${getLabelBgColor(result.label)}`}>
+      <div
+        className={`p-6 rounded-lg border border-hairline ${getLabelBgColor(result.label)}`}
+      >
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-ink">Prediction Result</h2>
+            <h2 className="text-lg font-semibold text-ink">
+              Prediction Result
+            </h2>
             <p className="text-sm text-muted mt-1">
-              {result.n_frames ? `Analyzed ${result.n_frames} frames` : 'Video analyzed'}
+              {result.n_frames
+                ? `Analyzed ${result.n_frames} frames`
+                : 'Video analyzed'}
             </p>
           </div>
           {result.label && (
-            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getLabelColor(result.label)}`}>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-semibold ${getLabelColor(result.label)}`}
+            >
               {result.label.toUpperCase()}
             </span>
           )}
         </div>
       </div>
 
-      {/* Confidence Score */}
       {result.confidence !== undefined && (
         <div className="bg-surface-card p-4 rounded-lg border border-hairline">
           <div className="flex items-center justify-between mb-2">
@@ -67,58 +73,67 @@ export function VideoUploadResults({ result }: VideoUploadResultsProps) {
         </div>
       )}
 
-      {/* Apex Detection Summary */}
       {result.n_apex_detected !== undefined && (
         <div className="bg-surface-card p-4 rounded-lg border border-hairline">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-5 h-5 text-brand-peach" />
-            <h3 className="text-sm font-medium text-ink">Micro-Expression Detection</h3>
+            <h3 className="text-sm font-medium text-ink">
+              Micro-Expression Detection
+            </h3>
           </div>
           <div className="text-2xl font-bold text-ink">
-            {result.n_apex_detected} apex{result.n_apex_detected !== 1 ? 'es' : ''} detected
+            {result.n_apex_detected} apex
+            {result.n_apex_detected !== 1 ? 'es' : ''} detected
           </div>
         </div>
       )}
 
-      {/* Top Features */}
       {result.top_features && result.top_features.length > 0 && (
         <div className="bg-surface-card p-4 rounded-lg border border-hairline">
-          <h3 className="text-sm font-medium text-ink mb-3">Top Contributing Features</h3>
+          <h3 className="text-sm font-medium text-ink mb-3">
+            Top Contributing Features
+          </h3>
           <div className="space-y-3">
-            {result.top_features.map((feature: TopPredictedFeature, idx: number) => (
-              <div key={idx} className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-ink">
-                      {feature.name.replace(/_/g, ' ')}
-                    </p>
-                    <span className="text-xs px-2 py-0.5 bg-surface-strong text-muted rounded">
-                      {feature.direction}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex-1 bg-surface-strong rounded-full h-1.5 overflow-hidden">
-                      <div
-                        className="h-full bg-brand-peach"
-                        style={{ width: `${Math.min(feature.saliency * 100, 100)}%` }}
-                      />
+            {result.top_features.map(
+              (feature: TopPredictedFeature, idx: number) => (
+                <div key={idx} className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-ink">
+                        {feature.name.replace(/_/g, ' ')}
+                      </p>
+                      <span className="text-xs px-2 py-0.5 bg-surface-strong text-muted rounded">
+                        {feature.direction}
+                      </span>
                     </div>
-                    <span className="text-xs text-muted whitespace-nowrap">
-                      Saliency: {(feature.saliency * 100).toFixed(0)}%
-                    </span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex-1 bg-surface-strong rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className="h-full bg-brand-peach"
+                          style={{
+                            width: `${Math.min(feature.saliency * 100, 100)}%`,
+                          }}
+                        />
+                      </div>
+                      <span className="text-xs text-muted whitespace-nowrap">
+                        Saliency: {(feature.saliency * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="ml-4 text-right">
+                    <p className="text-sm font-semibold text-ink">
+                      {feature.value.toFixed(3)}
+                    </p>
                   </div>
                 </div>
-                <div className="ml-4 text-right">
-                  <p className="text-sm font-semibold text-ink">{feature.value.toFixed(3)}</p>
-                </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </div>
       )}
 
-      {/* Magnitude Chart with Detected Phases */}
-      {(result.magnitudes && result.magnitudes.length > 0) || (result.detected_phases && result.detected_phases.length > 0) ? (
+      {(result.magnitudes && result.magnitudes.length > 0) ||
+      (result.detected_phases && result.detected_phases.length > 0) ? (
         <MagnitudeLineChart
           magnitudes={result.magnitudes || []}
           detected_phases={result.detected_phases}
@@ -126,17 +141,15 @@ export function VideoUploadResults({ result }: VideoUploadResultsProps) {
         />
       ) : null}
 
-      {/* Latency Info */}
       {result.latency_ms !== undefined && (
         <div className="text-xs text-muted text-right">
           Pipeline latency: {result.latency_ms.toFixed(2)}ms
         </div>
       )}
 
-      {/* Warning Message */}
       {result.warning && (
         <div className="flex items-start gap-3 p-3 bg-brand-ochre/10 border border-brand-ochre/20 rounded">
-          <AlertCircle className="w-5 h-5 text-brand-ochre flex-shrink-0 mt-0.5" />
+          <AlertCircle className="w-5 h-5 text-brand-ochre shrink-0 mt-0.5" />
           <p className="text-sm text-brand-ochre">{result.warning}</p>
         </div>
       )}

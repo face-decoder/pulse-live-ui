@@ -1,71 +1,32 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
-import { env } from '#/env'
+import { useCaptureSummary } from '#/features/summary/services/use-capture-summary'
+import { getErrorMessage } from '#/lib/api'
+import {
+  mergeSessionDetections,
+  formatStatusLabel,
+  isHighAnxietyLabel,
+} from '#/lib/detection'
 import { MotionTelemetryChart } from '#/features/micro-expression/components/motion-telemetry-chart'
 
 export default function SummaryPage() {
-  const [data, setData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const { data, error, isPending } = useCaptureSummary()
+  const detections = data?.detections ?? []
 
-  useEffect(() => {
-    const baseUrl = env.VITE_SOCKET_URL.replace('ws://', 'http://')
-      .replace('wss://', 'https://')
-      .split('/ws')[0]
-    fetch(`${baseUrl}/logs/summary`)
-      .then((r) => r.json())
-      .then((d) => {
-        setData(d)
-        setLoading(false)
-      })
-      .catch((e) => {
-        console.error(e)
-        setLoading(false)
-      })
-  }, [])
+  const mergedData = useMemo(
+    () => mergeSessionDetections(detections),
+    [detections],
+  )
 
-  const mergedData = useMemo(() => {
-    if (!data || data.length === 0) return null
-
-    let offsetAcc = 0
-    const mergedSmoothed: number[] = []
-    const mergedPhases: any[] = []
-    const chunks: any[] = []
-
-    data.forEach((d: any) => {
-      const len = (d.smoothed_magnitudes || []).length
-
-      mergedSmoothed.push(...(d.smoothed_magnitudes || []))
-
-      if (d.detected_phases) {
-        d.detected_phases.forEach((p: any) => {
-          mergedPhases.push({
-            onset: p.onset + offsetAcc,
-            apex: p.apex + offsetAcc,
-            offset: p.offset + offsetAcc,
-          })
-        })
-      }
-
-      chunks.push({
-        startIndex: offsetAcc,
-        endIndex: offsetAcc + len - 1,
-        label: d.label,
-        confidence: d.confidence,
-        latency_ms: d.latency_ms,
-      })
-
-      offsetAcc += len
-    })
-
-    return {
-      smoothed: mergedSmoothed,
-      phases: mergedPhases,
-      chunks: chunks,
-    }
-  }, [data])
-
-  if (loading)
+  if (isPending)
     return <div className="p-8 text-center text-ink">Loading summary...</div>
+
+  if (error)
+    return (
+      <div className="p-8 text-center text-brand-coral">
+        Error: {getErrorMessage(error)}
+      </div>
+    )
 
   return (
     <div className="bg-canvas min-h-screen text-ink p-8">
@@ -110,19 +71,9 @@ export default function SummaryPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-hairline">
-                    {mergedData.chunks.map((chunk: any, i: number) => {
+                    {mergedData.chunks.map((chunk, i) => {
                       const startTime = (i * 1.5).toFixed(1)
                       const endTime = ((i + 1) * 1.5).toFixed(1)
-
-                      const formatLabel = (lbl: string) => {
-                        if (lbl === 'anxiety_tinggi') return 'Anxiety Tinggi'
-                        if (lbl === 'anxiety_rendah') return 'Anxiety Rendah'
-                        return lbl.toUpperCase()
-                      }
-
-                      const isHigh =
-                        chunk.label === 'high' ||
-                        chunk.label === 'anxiety_tinggi'
 
                       return (
                         <tr
@@ -136,21 +87,23 @@ export default function SummaryPage() {
                             {startTime}s - {endTime}s
                           </td>
                           <td className="p-3 px-4 text-ink">
-                            {chunk.latency_ms}
+                            {chunk.latency_ms ?? '-'}
                           </td>
                           <td className="p-3 px-4">
                             <span
                               className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                                isHigh
+                                isHighAnxietyLabel(chunk.label)
                                   ? 'bg-brand-coral/20 text-brand-coral'
                                   : 'bg-brand-mint/20 text-brand-mint'
                               }`}
                             >
-                              {formatLabel(chunk.label)}
+                              {formatStatusLabel(chunk.label)}
                             </span>
                           </td>
                           <td className="p-3 px-4 text-ink font-mono">
-                            {(chunk.confidence * 100).toFixed(1)}%
+                            {chunk.confidence !== undefined
+                              ? `${(chunk.confidence * 100).toFixed(1)}%`
+                              : '-'}
                           </td>
                         </tr>
                       )

@@ -7,7 +7,6 @@ export default function VideoUploadPage() {
 
   return (
     <div className="min-h-screen bg-canvas flex flex-col">
-      {/* Header */}
       <header className="border-b border-hairline bg-canvas h-16 shrink-0">
         <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center gap-6">
@@ -33,13 +32,13 @@ export default function VideoUploadPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-ink">Video Analysis</h1>
             <p className="mt-2 text-lg text-body">
-              Upload a video to analyze micro-expressions and detect emotional spotting phases
+              Upload a video to analyze micro-expressions and detect emotional
+              spotting phases
             </p>
           </div>
 

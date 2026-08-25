@@ -20,7 +20,9 @@ export function DetectedPhasesTimeline({
       setCanScrollLeft(scrollContainerRef.current.scrollLeft > 0)
       setCanScrollRight(
         scrollContainerRef.current.scrollLeft <
-          scrollContainerRef.current.scrollWidth - scrollContainerRef.current.clientWidth - 10
+          scrollContainerRef.current.scrollWidth -
+            scrollContainerRef.current.clientWidth -
+            10,
       )
     }
   }
@@ -46,10 +48,11 @@ export function DetectedPhasesTimeline({
 
   return (
     <div className="bg-surface-card p-4 rounded-lg border border-hairline">
-      <h3 className="text-sm font-medium text-ink mb-3">Detected Phases Timeline</h3>
+      <h3 className="text-sm font-medium text-ink mb-3">
+        Detected Phases Timeline
+      </h3>
 
       <div className="space-y-4">
-        {/* Frame Scale Reference */}
         <div className="px-2">
           <div className="flex justify-between text-xs text-muted mb-1">
             <span>Frame 0</span>
@@ -59,20 +62,17 @@ export function DetectedPhasesTimeline({
           <div className="w-full h-1 bg-surface-strong rounded-full" />
         </div>
 
-        {/* Timeline Container */}
         <div className="relative">
           <div className="flex items-center gap-2">
-            {/* Left Scroll Button */}
             <button
               onClick={() => scroll('left')}
               disabled={!canScrollLeft}
-              className="flex-shrink-0 p-1.5 rounded border border-hairline bg-surface-soft hover:bg-surface-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="shrink-0 p-1.5 rounded border border-hairline bg-surface-soft hover:bg-surface-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               aria-label="Scroll left"
             >
               <ChevronLeft className="w-4 h-4 text-ink" />
             </button>
 
-            {/* Scrollable Phases */}
             <div
               ref={scrollContainerRef}
               onScroll={checkScroll}
@@ -95,18 +95,18 @@ export function DetectedPhasesTimeline({
                         Phase {idx + 1}
                       </div>
 
-                      {/* Mini Timeline Bar */}
                       <div className="w-48 h-8 bg-surface-strong rounded overflow-hidden flex items-center relative">
-                        {/* Full frame range indicator */}
                         <div className="absolute inset-0 flex">
-                          <div style={{ width: `${onsetPercent}%` }} className="bg-transparent" />
+                          <div
+                            style={{ width: `${onsetPercent}%` }}
+                            className="bg-transparent"
+                          />
                           <div
                             style={{ width: `${phaseWidth}%` }}
-                            className="bg-gradient-to-r from-brand-peach/40 to-brand-peach/60"
+                            className="bg-linear-to-r from-brand-peach/40 to-brand-peach/60"
                           />
                         </div>
 
-                        {/* Apex marker */}
                         <div
                           style={{
                             left: `${getFramePercentage(phase.apex)}%`,
@@ -115,17 +115,17 @@ export function DetectedPhasesTimeline({
                           title={`Apex: Frame ${phase.apex}`}
                         />
 
-                        {/* Frame numbers overlay */}
                         <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-ink pointer-events-none">
                           {duration} frames
                         </div>
                       </div>
 
-                      {/* Phase Details */}
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         <div>
                           <p className="text-muted">Onset</p>
-                          <p className="font-semibold text-ink">{phase.onset}</p>
+                          <p className="font-semibold text-ink">
+                            {phase.onset}
+                          </p>
                         </div>
                         <div>
                           <p className="text-muted">Apex</p>
@@ -133,7 +133,9 @@ export function DetectedPhasesTimeline({
                         </div>
                         <div>
                           <p className="text-muted">Offset</p>
-                          <p className="font-semibold text-ink">{phase.offset}</p>
+                          <p className="font-semibold text-ink">
+                            {phase.offset}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -142,11 +144,10 @@ export function DetectedPhasesTimeline({
               </div>
             </div>
 
-            {/* Right Scroll Button */}
             <button
               onClick={() => scroll('right')}
               disabled={!canScrollRight}
-              className="flex-shrink-0 p-1.5 rounded border border-hairline bg-surface-soft hover:bg-surface-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="shrink-0 p-1.5 rounded border border-hairline bg-surface-soft hover:bg-surface-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               aria-label="Scroll right"
             >
               <ChevronRight className="w-4 h-4 text-ink" />
@@ -154,7 +155,6 @@ export function DetectedPhasesTimeline({
           </div>
         </div>
 
-        {/* Stats Summary */}
         <div className="flex gap-4 text-xs bg-surface-soft p-2 rounded border border-hairline">
           <div>
             <p className="text-muted">Total Phases</p>
@@ -163,7 +163,8 @@ export function DetectedPhasesTimeline({
           <div>
             <p className="text-muted">Total Duration</p>
             <p className="font-semibold text-ink">
-              {phases.reduce((sum, phase) => sum + getPhaseDuration(phase), 0)} frames
+              {phases.reduce((sum, phase) => sum + getPhaseDuration(phase), 0)}{' '}
+              frames
             </p>
           </div>
           <div>

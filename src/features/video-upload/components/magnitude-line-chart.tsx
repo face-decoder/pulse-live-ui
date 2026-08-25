@@ -27,14 +27,12 @@ export function MagnitudeLineChart({
   const minMagnitude = Math.min(...magnitudes, 0)
   const magnitudeRange = maxMagnitude - minMagnitude || 1
 
-  // SVG dimensions and margins
   const width = 800
   const height = 300
   const margin = { top: 20, right: 30, bottom: 40, left: 50 }
   const chartWidth = width - margin.left - margin.right
   const chartHeight = height - margin.top - margin.bottom
 
-  // Scale functions
   const xScale = (frameIdx: number) => {
     return margin.left + (frameIdx / (frameCount - 1)) * chartWidth
   }
@@ -44,7 +42,6 @@ export function MagnitudeLineChart({
     return margin.top + chartHeight - normalizedValue * chartHeight
   }
 
-  // Generate path data for the line
   const pathData = magnitudes
     .map((value, idx) => {
       const x = xScale(idx)
@@ -53,7 +50,6 @@ export function MagnitudeLineChart({
     })
     .join(' ')
 
-  // Generate path for the area under the line
   const areaData =
     'M ' +
     xScale(0) +
@@ -63,7 +59,6 @@ export function MagnitudeLineChart({
     pathData.substring(2) +
     ` L ${xScale(magnitudes.length - 1)} ${margin.top + chartHeight} L ${xScale(0)} ${margin.top + chartHeight} Z`
 
-  // Get phase color in hex for SVG (since we need actual hex values)
   const getPhaseColorHex = (idx: number) => {
     const colors = ['#FBBF6F', '#D84949', '#4ECDC4', '#A8E6D9', '#F4A46B']
     return colors[idx % colors.length]
@@ -83,7 +78,6 @@ export function MagnitudeLineChart({
             viewBox={`0 0 ${width} ${height}`}
             className="w-full min-w-max"
           >
-            {/* Background grid */}
             <defs>
               <pattern
                 id="grid"
@@ -112,7 +106,6 @@ export function MagnitudeLineChart({
               </linearGradient>
             </defs>
 
-            {/* Phase highlights */}
             {detected_phases.map((phase, idx) => {
               const x1 = xScale(phase.onset)
               const x2 = xScale(phase.offset)
@@ -135,10 +128,8 @@ export function MagnitudeLineChart({
               )
             })}
 
-            {/* Area under line */}
             <path d={areaData} fill="url(#areaGradient)" />
 
-            {/* Magnitude line */}
             <path
               d={pathData}
               stroke="#4ECDC4"
@@ -148,7 +139,6 @@ export function MagnitudeLineChart({
               strokeLinejoin="round"
             />
 
-            {/* Apex markers from detected phases */}
             {detected_phases.map((phase, idx) => {
               const apexX = xScale(phase.apex)
               const apexValue = magnitudes[phase.apex] || 0
@@ -167,7 +157,6 @@ export function MagnitudeLineChart({
               )
             })}
 
-            {/* X-axis */}
             <line
               x1={margin.left}
               y1={margin.top + chartHeight}
@@ -177,7 +166,6 @@ export function MagnitudeLineChart({
               strokeWidth="1"
             />
 
-            {/* Y-axis */}
             <line
               x1={margin.left}
               y1={margin.top}
@@ -187,7 +175,6 @@ export function MagnitudeLineChart({
               strokeWidth="1"
             />
 
-            {/* X-axis labels (frame indices) */}
             {[0, 0.25, 0.5, 0.75, 1].map((ratio, idx) => {
               const frameIdx = Math.round(ratio * (frameCount - 1))
               const x = xScale(frameIdx)
@@ -215,7 +202,6 @@ export function MagnitudeLineChart({
               )
             })}
 
-            {/* Y-axis labels (magnitude range) */}
             {[0, 0.25, 0.5, 0.75, 1].map((ratio, idx) => {
               const value = minMagnitude + ratio * magnitudeRange
               const y = yScale(value)
@@ -243,7 +229,6 @@ export function MagnitudeLineChart({
               )
             })}
 
-            {/* Axis labels */}
             <text
               x={width / 2}
               y={height - 5}
@@ -270,7 +255,6 @@ export function MagnitudeLineChart({
         </div>
       </div>
 
-      {/* Phase Legend */}
       {detected_phases.length > 0 && (
         <div className="bg-surface-card p-4 rounded-lg border border-hairline">
           <h4 className="text-sm font-medium text-ink mb-3">Detected Phases</h4>
@@ -317,7 +301,6 @@ export function MagnitudeLineChart({
             })}
           </div>
 
-          {/* Summary Statistics */}
           <div className="mt-4 pt-4 border-t border-hairline">
             <div className="grid grid-cols-3 gap-4">
               <div>

@@ -1,12 +1,14 @@
-import { VideoOff } from "lucide-react";
+import { VideoOff } from 'lucide-react'
 
 export interface VideoCapturePermissionProps {
   error: string
 }
 
-export default function VideoCapturePermission({ error }: VideoCapturePermissionProps) {
+export default function VideoCapturePermission({
+  error,
+}: VideoCapturePermissionProps) {
   return (
-    <div className="flex w-full min-h-[350px] items-center justify-center bg-canvas p-4">
+    <div className="flex w-full min-h-87.5 items-center justify-center bg-canvas p-4">
       <div className="flex max-w-sm flex-col items-center gap-4 rounded-lg bg-surface-card p-6 text-center border border-hairline shadow-sm">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-pink/10 text-brand-pink">
           <VideoOff className="h-6 w-6" />

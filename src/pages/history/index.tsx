@@ -1,40 +1,25 @@
-import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { env } from '#/env'
-import { Loader2, ArrowRight, Activity } from 'lucide-react'
-
-type SessionItem = {
-  session_id: string
-  total_detections: number
-}
-
-type HistoryResponse = {
-  sessions: SessionItem[]
-}
+import { useHistorySessions } from '#/features/history/services/use-history-sessions'
+import { getErrorMessage } from '#/lib/api'
+import { ArrowRight, Activity, Loader2 } from 'lucide-react'
 
 export default function HistoryPage() {
-  const [sessions, setSessions] = useState<SessionItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data, error, isPending } = useHistorySessions()
+  const sessions = data?.sessions ?? []
 
-  const baseUrl = env.VITE_SOCKET_URL.replace('ws://', 'http://')
-    .replace('wss://', 'https://')
-    .split('/ws')[0]
+  if (isPending)
+    return (
+      <div className="p-8 text-center text-ink flex items-center justify-center min-h-screen">
+        <Loader2 className="animate-spin w-6 h-6 text-brand-pink" />
+      </div>
+    )
 
-  useEffect(() => {
-    fetch(`${baseUrl}/history`)
-      .then((r) => r.json())
-      .then((d: HistoryResponse) => {
-        setSessions(d.sessions || [])
-        setLoading(false)
-      })
-      .catch((e) => {
-        console.error(e)
-        setLoading(false)
-      })
-  }, [baseUrl])
-
-  if (loading)
-    return <div className="p-8 text-center text-ink flex items-center justify-center min-h-screen"><Loader2 className="animate-spin w-6 h-6 text-brand-pink" /></div>
+  if (error)
+    return (
+      <div className="p-8 text-center text-brand-coral">
+        Error: {getErrorMessage(error)}
+      </div>
+    )
 
   return (
     <div className="bg-canvas min-h-screen text-ink p-8">
@@ -60,13 +45,23 @@ export default function HistoryPage() {
         {sessions.length > 0 ? (
           <div className="space-y-4">
             {sessions.map((session) => (
-              <div key={session.session_id} className="border border-hairline rounded-xl p-5 bg-surface-soft flex items-center justify-between hover:bg-surface-soft/80 transition-colors shadow-sm hover:shadow-md">
+              <div
+                key={session.session_id}
+                className="border border-hairline rounded-xl p-5 bg-surface-soft flex items-center justify-between hover:bg-surface-soft/80 transition-colors shadow-sm hover:shadow-md"
+              >
                 <div>
-                  <h2 className="text-lg font-semibold text-ink">Sesi: <span className="font-mono text-sm bg-white px-2 py-1 rounded border border-hairline ml-2">{session.session_id}</span></h2>
-                  <p className="text-sm text-muted mt-2">{session.total_detections} deteksi ditemukan</p>
+                  <h2 className="text-lg font-semibold text-ink">
+                    Sesi:{' '}
+                    <span className="font-mono text-sm bg-white px-2 py-1 rounded border border-hairline ml-2">
+                      {session.session_id}
+                    </span>
+                  </h2>
+                  <p className="text-sm text-muted mt-2">
+                    {session.total_detections} deteksi ditemukan
+                  </p>
                 </div>
-                <Link 
-                  to="/history/$sessionId" 
+                <Link
+                  to="/history/$sessionId"
                   params={{ sessionId: session.session_id }}
                   className="bg-brand-coral hover:bg-brand-coral/90 text-white px-5 py-2.5 rounded-lg text-sm transition-colors font-medium shadow-sm hover:shadow-md flex items-center gap-2"
                 >

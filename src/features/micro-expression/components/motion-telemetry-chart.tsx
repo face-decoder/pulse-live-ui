@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
-import type { DetectedPhase } from '#/types'
+import type { DetectedPhase, TelemetryChunk } from '#/types'
 import { env } from '#/env'
+import { formatStatusLabel } from '#/lib/detection'
 
 export interface MotionTelemetryChartProps {
   magnitudes?: number[]
   smoothedMagnitudes?: number[]
   detectedPhases?: DetectedPhase[]
-  chunks?: any[]
+  chunks?: TelemetryChunk[]
 }
 
 export function MotionTelemetryChart({
@@ -22,133 +23,149 @@ export function MotionTelemetryChart({
 
   const [clickedPhase, setClickedPhase] = useState<{
     x: number
-    data: any
+    data: TelemetryChunk | undefined
   } | null>(null)
 
-  const { pointsRaw, pointsSmoothed, phaseMarkers, phaseHighlights, chartWidth, xTicks, chunkBoundaries } =
-    useMemo(() => {
-      let max = 0.2 // minimum baseline scale
-      for (const v of rawData) if (v > max) max = v
-      for (const v of smoothedData) if (v > max) max = v
-      max = max * 1.15 // 15% top padding
+  const {
+    pointsRaw,
+    pointsSmoothed,
+    phaseMarkers,
+    phaseHighlights,
+    chartWidth,
+    xTicks,
+    chunkBoundaries,
+  } = useMemo(() => {
+    let max = 0.2
+    for (const v of rawData) if (v > max) max = v
+    for (const v of smoothedData) if (v > max) max = v
+    max = max * 1.15
 
-      const width = Math.max(300, pointsCount * 15)
-      const height = 400
-      const paddingX = 15
-      const paddingY = 15
+    const width = Math.max(300, pointsCount * 15)
+    const height = 400
+    const paddingX = 15
+    const paddingY = 15
 
-      const getX = (index: number) => {
-        if (pointsCount <= 1) return paddingX
-        return paddingX + (index / (pointsCount - 1)) * (width - 2 * paddingX)
-      }
+    const getX = (index: number) => {
+      if (pointsCount <= 1) return paddingX
+      return paddingX + (index / (pointsCount - 1)) * (width - 2 * paddingX)
+    }
 
-      const getY = (val: number) => {
-        return height - paddingY - (val / max) * (height - 2 * paddingY)
-      }
+    const getY = (val: number) => {
+      return height - paddingY - (val / max) * (height - 2 * paddingY)
+    }
 
-      const pRaw = rawData.map((v, i) => ({ x: getX(i), y: getY(v) }))
-      const pSmoothed = smoothedData.map((v, i) => ({ x: getX(i), y: getY(v) }))
+    const pRaw = rawData.map((v, i) => ({ x: getX(i), y: getY(v) }))
+    const pSmoothed = smoothedData.map((v, i) => ({ x: getX(i), y: getY(v) }))
 
-      const markers: Array<{
-        type: 'onset' | 'apex' | 'offset'
-        x: number
-        y: number
-        label: string
-      }> = []
-      if (detectedPhases.length > 0) {
-        detectedPhases.forEach((phase) => {
-          if (typeof phase.onset === 'number' && phase.onset < pointsCount) {
-            const val = smoothedData[phase.onset] || rawData[phase.onset] || 0
-            markers.push({
-              type: 'onset',
-              x: getX(phase.onset),
-              y: getY(val),
-              label: 'Onset',
-            })
-          }
-          if (typeof phase.apex === 'number' && phase.apex < pointsCount) {
-            const val = smoothedData[phase.apex] || rawData[phase.apex] || 0
-            markers.push({
-              type: 'apex',
-              x: getX(phase.apex),
-              y: getY(val),
-              label: 'Apex',
-            })
-          }
-          if (
-            env.VITE_SPOTTING_MODE !== 'onset-apex' &&
-            typeof phase.offset === 'number' &&
-            phase.offset < pointsCount
-          ) {
-            const val = smoothedData[phase.offset] || rawData[phase.offset] || 0
-            markers.push({
-              type: 'offset',
-              x: getX(phase.offset),
-              y: getY(val),
-              label: 'Offset',
-            })
-          }
-        })
-      }
-
-      const highlights: Array<{ x: number; width: number; data: any }> = []
-      if (detectedPhases.length > 0) {
-        detectedPhases.forEach((phase) => {
-          let xStart = -1
-          let xEnd = -1
-
-          if (typeof phase.onset === 'number') {
-            xStart = getX(phase.onset)
-            
-            if (env.VITE_SPOTTING_MODE !== 'onset-apex' && typeof phase.offset === 'number') {
-              xEnd = getX(phase.offset)
-            } else if (typeof phase.apex === 'number') {
-              xEnd = getX(phase.apex)
-            }
-          }
-
-          if (xStart !== -1 && xEnd !== -1 && xEnd > xStart) {
-            const frameIndex = phase.onset
-            const chunkMatch = chunks.find((c) => frameIndex >= c.startIndex && frameIndex <= c.endIndex)
-            highlights.push({ x: xStart, width: xEnd - xStart, data: chunkMatch })
-          }
-        })
-      }
-
-      const ticks: Array<{ x: number; label: string }> = []
-      if (chunks.length > 0) {
-        ticks.push({ x: getX(chunks[0].startIndex), label: '0.0s' })
-        
-        for (let i = 1; i < chunks.length; i++) {
-          ticks.push({
-            x: getX(chunks[i].startIndex),
-            label: `${(i * 1.5).toFixed(1)}s`
+    const markers: Array<{
+      type: 'onset' | 'apex' | 'offset'
+      x: number
+      y: number
+      label: string
+    }> = []
+    if (detectedPhases.length > 0) {
+      detectedPhases.forEach((phase) => {
+        if (typeof phase.onset === 'number' && phase.onset < pointsCount) {
+          const val = smoothedData[phase.onset] || rawData[phase.onset] || 0
+          markers.push({
+            type: 'onset',
+            x: getX(phase.onset),
+            y: getY(val),
+            label: 'Onset',
           })
         }
-        
-        const lastChunk = chunks[chunks.length - 1]
+        if (typeof phase.apex === 'number' && phase.apex < pointsCount) {
+          const val = smoothedData[phase.apex] || rawData[phase.apex] || 0
+          markers.push({
+            type: 'apex',
+            x: getX(phase.apex),
+            y: getY(val),
+            label: 'Apex',
+          })
+        }
+        if (
+          env.VITE_SPOTTING_MODE !== 'onset-apex' &&
+          typeof phase.offset === 'number' &&
+          phase.offset < pointsCount
+        ) {
+          const val = smoothedData[phase.offset] || rawData[phase.offset] || 0
+          markers.push({
+            type: 'offset',
+            x: getX(phase.offset),
+            y: getY(val),
+            label: 'Offset',
+          })
+        }
+      })
+    }
+
+    const highlights: Array<{
+      x: number
+      width: number
+      data: TelemetryChunk | undefined
+    }> = []
+    if (detectedPhases.length > 0) {
+      detectedPhases.forEach((phase) => {
+        let xStart = -1
+        let xEnd = -1
+
+        if (typeof phase.onset === 'number') {
+          xStart = getX(phase.onset)
+
+          if (
+            env.VITE_SPOTTING_MODE !== 'onset-apex' &&
+            typeof phase.offset === 'number'
+          ) {
+            xEnd = getX(phase.offset)
+          } else if (typeof phase.apex === 'number') {
+            xEnd = getX(phase.apex)
+          }
+        }
+
+        if (xStart !== -1 && xEnd !== -1 && xEnd > xStart) {
+          const frameIndex = phase.onset
+          const chunkMatch = chunks.find(
+            (c) => frameIndex >= c.startIndex && frameIndex <= c.endIndex,
+          )
+          highlights.push({ x: xStart, width: xEnd - xStart, data: chunkMatch })
+        }
+      })
+    }
+
+    const ticks: Array<{ x: number; label: string }> = []
+    if (chunks.length > 0) {
+      ticks.push({ x: getX(chunks[0].startIndex), label: '0.0s' })
+
+      for (let i = 1; i < chunks.length; i++) {
         ticks.push({
-          x: getX(lastChunk.endIndex),
-          label: `${(chunks.length * 1.5).toFixed(1)}s`
+          x: getX(chunks[i].startIndex),
+          label: `${(i * 1.5).toFixed(1)}s`,
         })
       }
 
-      const boundaries: number[] = []
-      for (let i = 1; i < chunks.length; i++) {
-        boundaries.push(getX(chunks[i].startIndex))
-      }
+      const lastChunk = chunks[chunks.length - 1]
+      ticks.push({
+        x: getX(lastChunk.endIndex),
+        label: `${(chunks.length * 1.5).toFixed(1)}s`,
+      })
+    }
 
-      return {
-        maxValue: max,
-        pointsRaw: pRaw,
-        pointsSmoothed: pSmoothed,
-        phaseMarkers: markers,
-        phaseHighlights: highlights,
-        chartWidth: width,
-        xTicks: ticks,
-        chunkBoundaries: boundaries,
-      }
-    }, [rawData, smoothedData, detectedPhases, pointsCount, chunks])
+    const boundaries: number[] = []
+    for (let i = 1; i < chunks.length; i++) {
+      boundaries.push(getX(chunks[i].startIndex))
+    }
+
+    return {
+      maxValue: max,
+      pointsRaw: pRaw,
+      pointsSmoothed: pSmoothed,
+      phaseMarkers: markers,
+      phaseHighlights: highlights,
+      chartWidth: width,
+      xTicks: ticks,
+      chunkBoundaries: boundaries,
+    }
+  }, [rawData, smoothedData, detectedPhases, pointsCount, chunks])
 
   if (pointsCount === 0) {
     return (
@@ -208,13 +225,26 @@ export function MotionTelemetryChart({
                 stopOpacity="0.00"
               />
             </linearGradient>
-            <pattern id="arsirPattern" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <line x1="0" y1="0" x2="0" y2="10" stroke="var(--color-brand-mint)" strokeWidth="5" opacity="0.4" />
+            <pattern
+              id="arsirPattern"
+              width="10"
+              height="10"
+              patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)"
+            >
+              <line
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="10"
+                stroke="var(--color-brand-mint)"
+                strokeWidth="5"
+                opacity="0.4"
+              />
             </pattern>
           </defs>
 
-          {/* Phase Highlights (Arsir) */}
-          {phaseHighlights && phaseHighlights.map((hl, i) => (
+          {phaseHighlights.map((hl, i) => (
             <rect
               key={`hl-${i}`}
               x={hl.x}
@@ -230,7 +260,6 @@ export function MotionTelemetryChart({
             />
           ))}
 
-          {/* Grid lines */}
           {[15, 107.5, 200, 292.5, 385].map((y, i) => (
             <line
               key={i}
@@ -245,8 +274,7 @@ export function MotionTelemetryChart({
             />
           ))}
 
-          {/* Chunk Boundaries (Splits) */}
-          {chunkBoundaries && chunkBoundaries.map((xPos, i) => (
+          {chunkBoundaries.map((xPos, i) => (
             <line
               key={`split-${i}`}
               x1={xPos}
@@ -261,7 +289,6 @@ export function MotionTelemetryChart({
             />
           ))}
 
-          {/* Raw Line */}
           {rawPath && (
             <path
               d={rawPath}
@@ -274,10 +301,14 @@ export function MotionTelemetryChart({
             />
           )}
 
-          {/* Smoothed Area */}
-          {areaPath && <path d={areaPath} fill="url(#chartAreaGrad)" pointerEvents="none" />}
+          {areaPath && (
+            <path
+              d={areaPath}
+              fill="url(#chartAreaGrad)"
+              pointerEvents="none"
+            />
+          )}
 
-          {/* Smoothed Line */}
           {smoothedPath && (
             <path
               d={smoothedPath}
@@ -290,7 +321,6 @@ export function MotionTelemetryChart({
             />
           )}
 
-          {/* Phase vertical markers */}
           {phaseMarkers.map((marker, i) => (
             <g key={i} pointerEvents="none">
               <line
@@ -341,8 +371,7 @@ export function MotionTelemetryChart({
             </g>
           ))}
 
-          {/* X Axis Ticks (Time Timeline) */}
-          {xTicks && xTicks.map((tick, i) => (
+          {xTicks.map((tick, i) => (
             <g key={`xtick-${i}`} pointerEvents="none">
               <line
                 x1={tick.x}
@@ -367,7 +396,6 @@ export function MotionTelemetryChart({
           ))}
         </svg>
 
-        {/* Click Popover */}
         {clickedPhase && clickedPhase.data && (
           <div
             className="absolute top-4 z-50 bg-ink text-canvas px-3 py-2 rounded-md shadow-lg pointer-events-none transition-all flex flex-col gap-1"
@@ -381,19 +409,17 @@ export function MotionTelemetryChart({
               Inference Data
             </div>
             <div className="text-xs font-bold">
-              {clickedPhase.data.label === 'anxiety_tinggi' 
-                ? 'Anxiety Tinggi' 
-                : clickedPhase.data.label === 'anxiety_rendah' 
-                ? 'Anxiety Rendah' 
-                : clickedPhase.data.label}
+              {formatStatusLabel(clickedPhase.data.label)}
             </div>
             <div className="text-xs">
               <span className="text-muted-soft">Conf:</span>{' '}
-              {(clickedPhase.data.confidence * 100).toFixed(1)}%
+              {clickedPhase.data.confidence !== undefined
+                ? `${(clickedPhase.data.confidence * 100).toFixed(1)}%`
+                : '-'}
             </div>
             <div className="text-xs">
               <span className="text-muted-soft">Lat:</span>{' '}
-              {clickedPhase.data.latency_ms}ms
+              {clickedPhase.data.latency_ms ?? '-'}ms
             </div>
           </div>
         )}

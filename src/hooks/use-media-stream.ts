@@ -14,11 +14,24 @@ export interface UseMediaStreamReturn {
   isStreamActive: boolean
 }
 
-/**
- * Manages local media stream (camera + mic) and screen sharing.
- * Handles getUserMedia acquisition, track toggling, and cleanup on unmount.
- */
-export function useMediaStream(options: { enabled?: boolean } = {}): UseMediaStreamReturn {
+const cameraConstraints: MediaStreamConstraints = {
+  video: {
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
+    facingMode: 'user',
+  },
+  audio: false,
+}
+
+function toErrorMessage(err: unknown): string {
+  return err instanceof DOMException && err.name === 'NotAllowedError'
+    ? 'Camera/microphone access denied. Please allow permissions and reload.'
+    : 'Could not access camera or microphone.'
+}
+
+export function useMediaStream(
+  options: { enabled?: boolean } = {},
+): UseMediaStreamReturn {
   const { enabled = true } = options
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [screenStream, setScreenStream] = useState<MediaStream | null>(null)
@@ -30,30 +43,25 @@ export function useMediaStream(options: { enabled?: boolean } = {}): UseMediaStr
   const [isStreamActive, setIsStreamActive] = useState(false)
   const streamRef = useRef<MediaStream | null>(null)
 
+  const applyStream = useCallback((mediaStream: MediaStream) => {
+    streamRef.current = mediaStream
+    setStream(mediaStream)
+    setIsStreamActive(true)
+    setIsCameraOff(false)
+    setError(null)
+  }, [])
+
   const startStream = useCallback(async () => {
     setIsLoading(true)
     setError(null)
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
-        audio: false,
-      })
-
-      streamRef.current = mediaStream
-      setStream(mediaStream)
-      setIsStreamActive(true)
-      setIsCameraOff(false)
-      setError(null)
+      applyStream(await navigator.mediaDevices.getUserMedia(cameraConstraints))
     } catch (err) {
-      const message =
-        err instanceof DOMException && err.name === 'NotAllowedError'
-          ? 'Camera/microphone access denied. Please allow permissions and reload.'
-          : 'Could not access camera or microphone.'
-      setError(message)
+      setError(toErrorMessage(err))
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [applyStream])
 
   useEffect(() => {
     if (!enabled) {
@@ -66,29 +74,17 @@ export function useMediaStream(options: { enabled?: boolean } = {}): UseMediaStr
 
     async function initStream() {
       try {
-        const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
-          audio: false,
-        })
+        const mediaStream =
+          await navigator.mediaDevices.getUserMedia(cameraConstraints)
 
         if (cancelled) {
           mediaStream.getTracks().forEach((t) => t.stop())
           return
         }
 
-        streamRef.current = mediaStream
-        setStream(mediaStream)
-        setIsStreamActive(true)
-        setIsCameraOff(false)
-        setError(null)
+        applyStream(mediaStream)
       } catch (err) {
-        if (!cancelled) {
-          const message =
-            err instanceof DOMException && err.name === 'NotAllowedError'
-              ? 'Camera/microphone access denied. Please allow permissions and reload.'
-              : 'Could not access camera or microphone.'
-          setError(message)
-        }
+        if (!cancelled) setError(toErrorMessage(err))
       } finally {
         if (!cancelled) setIsLoading(false)
       }
@@ -101,7 +97,7 @@ export function useMediaStream(options: { enabled?: boolean } = {}): UseMediaStr
       streamRef.current?.getTracks().forEach((t) => t.stop())
       streamRef.current = null
     }
-  }, [enabled])
+  }, [enabled, applyStream])
 
   const toggleMute = useCallback(() => {
     if (!streamRef.current) return
@@ -123,11 +119,15 @@ export function useMediaStream(options: { enabled?: boolean } = {}): UseMediaStr
     setIsCameraOff((prev) => !prev)
   }, [isStreamActive, startStream])
 
+  const stopScreenShare = useCallback(() => {
+    screenStream?.getTracks().forEach((t) => t.stop())
+    setScreenStream(null)
+    setIsScreenSharing(false)
+  }, [screenStream])
+
   const toggleScreenShare = useCallback(async () => {
-    if (isScreenSharing && screenStream) {
-      screenStream.getTracks().forEach((t) => t.stop())
-      setScreenStream(null)
-      setIsScreenSharing(false)
+    if (isScreenSharing) {
+      stopScreenShare()
       return
     }
 
@@ -144,10 +144,8 @@ export function useMediaStream(options: { enabled?: boolean } = {}): UseMediaStr
         setScreenStream(null)
         setIsScreenSharing(false)
       })
-    } catch {
-      // User cancelled screen share picker
-    }
-  }, [isScreenSharing, screenStream])
+    } catch {}
+  }, [isScreenSharing, stopScreenShare])
 
   const activeStream = isScreenSharing && screenStream ? screenStream : stream
 
