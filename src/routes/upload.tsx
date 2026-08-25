@@ -5,6 +5,16 @@ import { MotionTelemetryChart } from '#/features/micro-expression/components/mot
 import { uploadFileOverWebSocket } from '#/lib/chunked-upload'
 import { formatStatusLabel, isHighAnxietyLabel } from '#/lib/detection'
 import type { PredictionResult, TelemetryChunk } from '#/types'
+import { Card, CardHeader, CardTitle } from '#/components/ui/card'
+import { Badge } from '#/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '#/components/ui/table'
 
 interface RollingSummary {
   total_windows: number
@@ -98,29 +108,31 @@ function VideoUploadRoute() {
 
   return (
     <div className="bg-canvas min-h-screen text-ink p-8">
-      <div className="w-full max-w-[95vw] mx-auto bg-surface-card border border-hairline rounded-xl p-8 shadow-sm">
-        <h1 className="text-2xl font-bold mb-4">Video Analysis Upload</h1>
-        <Link
-          to="/"
-          className="text-brand-pink text-sm underline mb-8 inline-block mr-4"
-        >
-          Back to Capture
-        </Link>
-        <Link
-          to="/summary"
-          className="text-brand-pink text-sm underline mb-8 inline-block"
-        >
-          View Summary
-        </Link>
+      <Card className="w-full max-w-[95vw] mx-auto p-8">
+        <CardHeader>
+          <CardTitle className="text-2xl">Video Analysis Upload</CardTitle>
+          <Link
+            to="/"
+            className="text-brand-pink text-sm underline mb-8 inline-block mr-4"
+          >
+            Back to Capture
+          </Link>
+          <Link
+            to="/summary"
+            className="text-brand-pink text-sm underline mb-8 inline-block"
+          >
+            View Summary
+          </Link>
+        </CardHeader>
 
-        <div className="mb-8 p-4 border border-hairline rounded bg-surface-soft flex items-center justify-between">
+        <div className="mb-8 p-4 border rounded-md bg-accent flex items-center justify-between">
           <input
             type="file"
             accept="video/webm"
             onChange={handleUpload}
             className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-on-primary hover:file:bg-brand-coral transition-colors"
           />
-          <span className="font-mono text-sm text-muted">
+          <span className="font-mono text-sm text-muted-foreground">
             {statusLabel[status]}
           </span>
         </div>
@@ -155,7 +167,7 @@ function VideoUploadRoute() {
         {summary &&
           summary.smoothed_magnitudes &&
           summary.smoothed_magnitudes.length > 0 && (
-            <div className="p-4 border border-hairline rounded bg-surface-soft mb-8">
+            <div className="p-4 border rounded-md bg-accent mb-8">
               <MotionTelemetryChart
                 magnitudes={summary.magnitudes ?? []}
                 smoothedMagnitudes={summary.smoothed_magnitudes}
@@ -166,66 +178,48 @@ function VideoUploadRoute() {
           )}
 
         {predictions.length > 0 && (
-          <div className="bg-surface-card border border-hairline rounded-xl overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-surface-soft border-b border-hairline">
-                  <tr>
-                    <th className="p-3 px-4 font-semibold text-muted">No.</th>
-                    <th className="p-3 px-4 font-semibold text-muted">
-                      Waktu (Detik)
-                    </th>
-                    <th className="p-3 px-4 font-semibold text-muted">
-                      Latency (ms)
-                    </th>
-                    <th className="p-3 px-4 font-semibold text-muted">
-                      Hasil Deteksi
-                    </th>
-                    <th className="p-3 px-4 font-semibold text-muted">
-                      Confidence
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-hairline">
-                  {predictions.map((p, i) => {
-                    const startTime = (i * 1.5).toFixed(1)
-                    const endTime = ((i + 1) * 1.5).toFixed(1)
-
-                    return (
-                      <tr
-                        key={i}
-                        className="bg-white hover:bg-surface-soft/50 transition-colors"
+          <Card className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="px-4">No.</TableHead>
+                  <TableHead className="px-4">Waktu (Detik)</TableHead>
+                  <TableHead className="px-4">Latency (ms)</TableHead>
+                  <TableHead className="px-4">Hasil Deteksi</TableHead>
+                  <TableHead className="px-4">Confidence</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {predictions.map((p, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="px-4 font-medium">{i + 1}</TableCell>
+                    <TableCell className="px-4">
+                      {(i * 1.5).toFixed(1)}s - {((i + 1) * 1.5).toFixed(1)}s
+                    </TableCell>
+                    <TableCell className="px-4">{p.latency_ms ?? 0}</TableCell>
+                    <TableCell className="px-4">
+                      <Badge
+                        className={
+                          isHighAnxietyLabel(p.label)
+                            ? 'bg-brand-coral/20 text-brand-coral hover:bg-brand-coral/20'
+                            : 'bg-brand-mint/30 text-brand-teal hover:bg-brand-mint/30'
+                        }
                       >
-                        <td className="p-3 px-4 text-ink font-medium">
-                          {i + 1}
-                        </td>
-                        <td className="p-3 px-4 text-ink">
-                          {startTime}s - {endTime}s
-                        </td>
-                        <td className="p-3 px-4 text-ink">
-                          {p.latency_ms ?? 0}
-                        </td>
-                        <td className="p-3 px-4">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-xs font-bold ${isHighAnxietyLabel(p.label) ? 'bg-brand-coral/20 text-brand-coral' : 'bg-brand-mint/20 text-brand-mint'}`}
-                          >
-                            {formatStatusLabel(p.label)}
-                          </span>
-                        </td>
-                        <td className="p-3 px-4 text-ink font-mono">
-                          {p.confidence !== undefined
-                            ? `${(p.confidence * 100).toFixed(1)}%`
-                            : '-'}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                        {formatStatusLabel(p.label)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-4 font-mono">
+                      {p.confidence !== undefined
+                        ? `${(p.confidence * 100).toFixed(1)}%`
+                        : '-'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

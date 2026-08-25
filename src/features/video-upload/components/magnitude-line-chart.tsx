@@ -17,7 +17,9 @@ export function MagnitudeLineChart({
   if (magnitudes.length === 0) {
     return (
       <div className="bg-surface-card p-4 rounded-lg border border-hairline flex items-center justify-center h-64">
-        <p className="text-sm text-muted">No magnitude data available</p>
+        <p className="text-sm text-muted-foreground">
+          No magnitude data available
+        </p>
       </div>
     )
   }
@@ -286,7 +288,7 @@ export function MagnitudeLineChart({
                       <p className="text-sm font-medium text-ink">
                         Phase {idx + 1}
                       </p>
-                      <div className="text-xs text-muted mt-1 space-y-0.5">
+                      <div className="text-xs text-muted-foreground mt-1 space-y-0.5">
                         <p>Onset: Frame {phase.onset}</p>
                         <p>Apex: Frame {phase.apex}</p>
                         <p>Offset: Frame {phase.offset}</p>
@@ -304,13 +306,13 @@ export function MagnitudeLineChart({
           <div className="mt-4 pt-4 border-t border-hairline">
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <p className="text-xs text-muted">Total Phases</p>
+                <p className="text-xs text-muted-foreground">Total Phases</p>
                 <p className="text-lg font-semibold text-ink">
                   {detected_phases.length}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted">Total Duration</p>
+                <p className="text-xs text-muted-foreground">Total Duration</p>
                 <p className="text-lg font-semibold text-ink">
                   {detected_phases.reduce(
                     (sum, p) => sum + (p.offset - p.onset + 1),
@@ -320,7 +322,7 @@ export function MagnitudeLineChart({
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted">Video Length</p>
+                <p className="text-xs text-muted-foreground">Video Length</p>
                 <p className="text-lg font-semibold text-ink">
                   {frameCount} frames
                 </p>

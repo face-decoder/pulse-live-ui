@@ -48,7 +48,7 @@ export function FeatureCardsSection({ innerRef }: FeatureCardsSectionProps) {
           <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-ink">
             State-of-the-art conversational analysis
           </h2>
-          <p className="text-xs md:text-sm text-muted mt-3">
+          <p className="text-xs md:text-sm text-muted-foreground mt-3">
             Pulse Live leverages high-fidelity model endpoints to recognize
             facial cues in high-stakes settings.
           </p>

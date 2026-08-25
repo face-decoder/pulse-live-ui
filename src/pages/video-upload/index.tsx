@@ -12,7 +12,7 @@ export default function VideoUploadPage() {
           <div className="flex items-center gap-6">
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-muted hover:text-ink transition-colors px-3 py-1.5 rounded-md border border-hairline bg-surface-soft/40 hover:bg-surface-soft"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-ink transition-colors px-3 py-1.5 rounded-md border border-hairline bg-surface-soft/40 hover:bg-surface-soft"
             >
               <ChevronLeft size={14} />
               <span>Back to Home</span>

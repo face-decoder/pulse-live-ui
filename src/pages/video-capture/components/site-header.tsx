@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { Button } from '#/components/ui/button'
 
 export type LandingSection = 'demo' | 'features' | 'technology'
 
@@ -19,7 +20,7 @@ export function SiteHeader({ onNavigate }: SiteHeaderProps) {
           </span>
         </div>
 
-        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-muted">
+        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-muted-foreground">
           <Link to="/upload" className="hover:text-ink transition-colors">
             Upload
           </Link>
@@ -28,37 +29,31 @@ export function SiteHeader({ onNavigate }: SiteHeaderProps) {
           </Link>
           <button
             onClick={() => onNavigate('features')}
-            className="hover:text-ink transition-colors cursor-pointer bg-transparent border-none p-0 text-xs font-semibold font-sans text-muted hover:text-ink"
+            className="hover:text-ink transition-colors cursor-pointer bg-transparent border-none p-0 text-xs font-semibold font-sans text-muted-foreground hover:text-ink"
           >
             Features
           </button>
           <button
             onClick={() => onNavigate('technology')}
-            className="hover:text-ink transition-colors cursor-pointer bg-transparent border-none p-0 text-xs font-semibold font-sans text-muted hover:text-ink"
+            className="hover:text-ink transition-colors cursor-pointer bg-transparent border-none p-0 text-xs font-semibold font-sans text-muted-foreground hover:text-ink"
           >
             Technology
           </button>
           <button
             onClick={() => onNavigate('demo')}
-            className="hover:text-ink transition-colors cursor-pointer bg-transparent border-none p-0 text-xs font-semibold font-sans text-muted hover:text-ink"
+            className="hover:text-ink transition-colors cursor-pointer bg-transparent border-none p-0 text-xs font-semibold font-sans text-muted-foreground hover:text-ink"
           >
             Sandbox
           </button>
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link
-            to="/upload"
-            className="rounded-md bg-surface-card text-ink hover:bg-surface-strong px-4 py-2 text-xs font-bold transition-all shadow-sm border border-hairline"
-          >
-            Upload Video
-          </Link>
-          <Link
-            to="/demo"
-            className="rounded-md bg-primary text-on-primary hover:bg-brand-pink hover:text-white px-4 py-2 text-xs font-bold transition-all shadow-sm"
-          >
-            Launch Demo
-          </Link>
+          <Button variant="outline" asChild className="text-xs font-bold">
+            <Link to="/upload">Upload Video</Link>
+          </Button>
+          <Button asChild className="text-xs font-bold hover:bg-brand-pink">
+            <Link to="/demo">Launch Demo</Link>
+          </Button>
         </div>
       </div>
     </header>

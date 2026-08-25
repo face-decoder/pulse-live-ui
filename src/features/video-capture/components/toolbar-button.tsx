@@ -1,3 +1,4 @@
+import { Button } from '#/components/ui/button'
 import type { LucideIcon } from 'lucide-react'
 
 interface ToolbarButtonProps {
@@ -17,33 +18,30 @@ export function ToolbarButton({
   accent = false,
   onClick,
 }: ToolbarButtonProps) {
-  const base =
-    'group relative flex h-11 w-11 items-center justify-center rounded-md transition-all duration-200 cursor-pointer border outline-none font-semibold text-sm select-none'
+  const className = danger
+    ? 'hover:bg-brand-coral'
+    : active
+      ? 'bg-brand-pink text-white hover:bg-brand-pink/90'
+      : accent
+        ? 'bg-brand-teal text-white hover:bg-brand-teal/90'
+        : ''
 
-  let variant: string
-  if (danger) {
-    variant =
-      'bg-primary text-on-primary hover:bg-brand-coral hover:text-white border-transparent shadow-sm'
-  } else if (active) {
-    variant =
-      'bg-brand-pink text-white hover:bg-brand-pink/90 border-transparent shadow-sm'
-  } else if (accent) {
-    variant =
-      'bg-brand-teal text-white hover:bg-brand-teal/90 border-transparent shadow-sm'
-  } else {
-    variant =
-      'bg-canvas text-ink border-hairline hover:bg-surface-soft hover:border-muted-soft'
-  }
+  const variant = danger
+    ? 'destructive'
+    : active || accent
+      ? 'default'
+      : 'outline'
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`${base} ${variant}`}
+    <Button
+      variant={variant}
+      size="icon"
       aria-label={label}
       title={label}
+      onClick={onClick}
+      className={`size-11 rounded-md ${className}`}
     >
-      <Icon size={18} strokeWidth={2} />
-    </button>
+      <Icon />
+    </Button>
   )
 }

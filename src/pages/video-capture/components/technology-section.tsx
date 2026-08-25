@@ -11,7 +11,7 @@ export function TechnologySection() {
           <h2 className="text-3xl font-extrabold tracking-tight text-ink">
             Seamlessly integrated. Fully optimized.
           </h2>
-          <p className="text-xs md:text-sm text-muted leading-relaxed">
+          <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
             Pulse Live combines modern front-end tooling with optimized video
             decoding pipelines to bring raw performance right into your browser.
           </p>
@@ -33,7 +33,7 @@ export function TechnologySection() {
           </ul>
         </div>
         <div className="flex-1 bg-surface-card border border-hairline rounded-xl p-8 w-full">
-          <h4 className="text-xs font-bold text-muted uppercase tracking-wider mb-4">
+          <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4">
             Real-time WebRTC Session Code
           </h4>
           <pre className="bg-canvas border border-hairline rounded-md p-4 text-[10px] font-mono text-ink/80 overflow-x-auto">

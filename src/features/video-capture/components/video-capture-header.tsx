@@ -26,11 +26,13 @@ export default function VideoCaptureHeader({
       <div className="flex items-center gap-2 rounded-xl bg-canvas/80 px-4 py-2 backdrop-blur-md border border-hairline">
         <span className="text-sm font-semibold text-ink">{time}</span>
         <span className="h-4 w-px bg-hairline" />
-        <span className="text-sm text-muted font-medium">pulse-live</span>
+        <span className="text-sm text-muted-foreground font-medium">
+          pulse-live
+        </span>
       </div>
 
       <div
-        className="flex h-8 w-8 items-center justify-center rounded-lg bg-canvas/80 backdrop-blur-md border border-hairline text-muted hover:text-ink cursor-help transition-colors"
+        className="flex h-8 w-8 items-center justify-center rounded-lg bg-canvas/80 backdrop-blur-md border border-hairline text-muted-foreground hover:text-ink cursor-help transition-colors"
         title="End-to-end encrypted"
       >
         <Shield size={14} />

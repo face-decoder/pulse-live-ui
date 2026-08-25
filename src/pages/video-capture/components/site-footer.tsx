@@ -1,3 +1,5 @@
+import { Button } from '#/components/ui/button'
+
 interface SiteFooterProps {
   onGoToSandbox: () => void
 }
@@ -15,20 +17,20 @@ export function SiteFooter({ onGoToSandbox }: SiteFooterProps) {
           <h3 className="text-lg font-bold text-ink">
             Ready to start analyzing?
           </h3>
-          <p className="text-xs text-muted mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             Connect your webcam sandbox demo above. Experiment with expression
             telemetry instantly.
           </p>
-          <button
+          <Button
             onClick={onGoToSandbox}
-            className="mt-4 rounded-md bg-brand-pink text-white hover:bg-brand-pink/90 px-4 py-2 text-xs font-bold transition-all shadow-sm cursor-pointer border-none font-sans"
+            className="mt-4 bg-brand-pink text-white hover:bg-brand-pink/90 text-xs font-bold"
           >
             Go to Sandbox
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center justify-between border-t border-hairline pt-6 text-[10px] text-muted gap-4">
+      <div className="flex flex-col md:flex-row items-center justify-between border-t border-hairline pt-6 text-[10px] text-muted-foreground gap-4">
         <span>© 2026 Pulse Live. Powered by the Clay brand design system.</span>
         <div className="flex gap-6 font-semibold">
           <a href="#" className="hover:text-ink transition-colors">

@@ -54,7 +54,7 @@ export function DetectedPhasesTimeline({
 
       <div className="space-y-4">
         <div className="px-2">
-          <div className="flex justify-between text-xs text-muted mb-1">
+          <div className="flex justify-between text-xs text-muted-foreground mb-1">
             <span>Frame 0</span>
             <span>Frame {Math.round(n_frames / 2)}</span>
             <span>Frame {n_frames}</span>
@@ -122,17 +122,17 @@ export function DetectedPhasesTimeline({
 
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         <div>
-                          <p className="text-muted">Onset</p>
+                          <p className="text-muted-foreground">Onset</p>
                           <p className="font-semibold text-ink">
                             {phase.onset}
                           </p>
                         </div>
                         <div>
-                          <p className="text-muted">Apex</p>
+                          <p className="text-muted-foreground">Apex</p>
                           <p className="font-semibold text-ink">{phase.apex}</p>
                         </div>
                         <div>
-                          <p className="text-muted">Offset</p>
+                          <p className="text-muted-foreground">Offset</p>
                           <p className="font-semibold text-ink">
                             {phase.offset}
                           </p>
@@ -157,18 +157,18 @@ export function DetectedPhasesTimeline({
 
         <div className="flex gap-4 text-xs bg-surface-soft p-2 rounded border border-hairline">
           <div>
-            <p className="text-muted">Total Phases</p>
+            <p className="text-muted-foreground">Total Phases</p>
             <p className="font-semibold text-ink">{phases.length}</p>
           </div>
           <div>
-            <p className="text-muted">Total Duration</p>
+            <p className="text-muted-foreground">Total Duration</p>
             <p className="font-semibold text-ink">
               {phases.reduce((sum, phase) => sum + getPhaseDuration(phase), 0)}{' '}
               frames
             </p>
           </div>
           <div>
-            <p className="text-muted">Video Length</p>
+            <p className="text-muted-foreground">Video Length</p>
             <p className="font-semibold text-ink">{n_frames} frames</p>
           </div>
         </div>

@@ -169,7 +169,7 @@ export function MotionTelemetryChart({
 
   if (pointsCount === 0) {
     return (
-      <div className="flex h-48 items-center justify-center text-[10px] text-muted font-semibold bg-canvas rounded-lg border border-hairline p-4">
+      <div className="flex h-48 items-center justify-center text-[10px] text-muted-foreground font-semibold bg-canvas rounded-lg border border-hairline p-4">
         No motion telemetry available
       </div>
     )
@@ -195,7 +195,7 @@ export function MotionTelemetryChart({
         </h4>
         <div className="flex gap-2.5 text-[9px] font-bold">
           {rawData.length > 0 && (
-            <span className="flex items-center gap-1 text-muted">
+            <span className="flex items-center gap-1 text-muted-foreground">
               <span className="w-2 h-0.5 bg-brand-lavender inline-block" /> Raw
             </span>
           )}

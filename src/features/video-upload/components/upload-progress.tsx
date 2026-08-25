@@ -1,4 +1,5 @@
 import { CheckCircle, Loader } from 'lucide-react'
+import { Progress } from '#/components/ui/progress'
 import type { UploadProgressState, VideoStatus } from '#/types'
 import { formatFileSize } from '#/lib/format'
 
@@ -13,20 +14,6 @@ const statusLabels: Record<VideoStatus, string> = {
   completed: 'Completed',
 }
 
-const statusColors: Record<VideoStatus, string> = {
-  completed: 'text-brand-teal',
-  processing: 'text-brand-peach',
-  receiving: 'text-brand-peach',
-  received: 'text-muted',
-}
-
-const barColors: Record<VideoStatus, string> = {
-  completed: 'bg-brand-teal',
-  processing: 'bg-brand-peach',
-  receiving: 'bg-brand-peach',
-  received: 'bg-muted-soft',
-}
-
 export function UploadProgress({ progress }: UploadProgressProps) {
   return (
     <div className="w-full space-y-3">
@@ -37,22 +24,19 @@ export function UploadProgress({ progress }: UploadProgressProps) {
           ) : (
             <Loader className="w-5 h-5 text-brand-peach animate-spin" />
           )}
-          <span className={`font-medium ${statusColors[progress.status]}`}>
+          <span className="font-medium text-muted-foreground">
             {statusLabels[progress.status]}
           </span>
         </div>
-        <span className="text-sm text-muted">{progress.percentage}%</span>
+        <span className="text-sm text-muted-foreground">
+          {progress.percentage}%
+        </span>
       </div>
 
-      <div className="w-full bg-surface-strong rounded-full h-2 overflow-hidden">
-        <div
-          className={`h-full transition-all duration-300 ${barColors[progress.status]}`}
-          style={{ width: `${progress.percentage}%` }}
-        />
-      </div>
+      <Progress value={progress.percentage} className="h-2 bg-surface-strong" />
 
       {progress.totalBytes > 0 && (
-        <div className="flex justify-between text-xs text-muted">
+        <div className="flex justify-between text-xs text-muted-foreground">
           <span>
             {formatFileSize(progress.bytesUploaded)} /{' '}
             {formatFileSize(progress.totalBytes)}
@@ -66,7 +50,7 @@ export function UploadProgress({ progress }: UploadProgressProps) {
       )}
 
       {progress.statusMessage && progress.status === 'processing' && (
-        <div className="text-sm text-brand-peach bg-brand-peach/10 p-2 rounded border border-brand-peach/20">
+        <div className="text-sm text-brand-peach bg-brand-peach/10 p-2 rounded-md border border-brand-peach/20">
           {progress.statusMessage}
         </div>
       )}

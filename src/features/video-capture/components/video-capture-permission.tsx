@@ -14,7 +14,7 @@ export default function VideoCapturePermission({
           <VideoOff className="h-6 w-6" />
         </div>
         <h2 className="text-lg font-semibold text-ink">Camera access needed</h2>
-        <p className="text-xs text-muted leading-relaxed">{error}</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">{error}</p>
         <button
           type="button"
           onClick={() => window.location.reload()}

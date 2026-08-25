@@ -18,7 +18,7 @@ export function HeroSection({ children }: HeroSectionProps) {
         <span className="text-brand-pink">.</span>
       </h1>
 
-      <p className="text-base md:text-lg text-muted max-w-2xl leading-relaxed mb-10">
+      <p className="text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed mb-10">
         Understand the subtle emotional cues that define high-stakes decisions.
         Pulse Live tracks neural facial muscle activity at sub-100ms latency.
       </p>
@@ -30,7 +30,7 @@ export function HeroSection({ children }: HeroSectionProps) {
             <div className="w-3 h-3 rounded-full bg-brand-ochre/40" />
             <div className="w-3 h-3 rounded-full bg-brand-mint/40" />
           </div>
-          <span className="text-[10px] font-bold text-muted mx-auto uppercase tracking-widest">
+          <span className="text-[10px] font-bold text-muted-foreground mx-auto uppercase tracking-widest">
             Live Capture Sandbox
           </span>
         </div>

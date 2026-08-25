@@ -33,7 +33,7 @@ export function VideoUploadResults({ result }: VideoUploadResultsProps) {
             <h2 className="text-lg font-semibold text-ink">
               Prediction Result
             </h2>
-            <p className="text-sm text-muted mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {result.n_frames
                 ? `Analyzed ${result.n_frames} frames`
                 : 'Video analyzed'}
@@ -65,7 +65,7 @@ export function VideoUploadResults({ result }: VideoUploadResultsProps) {
             />
           </div>
           {result.prob_high !== undefined && result.prob_low !== undefined && (
-            <div className="flex justify-between text-xs text-muted mt-2">
+            <div className="flex justify-between text-xs text-muted-foreground mt-2">
               <span>High: {(result.prob_high * 100).toFixed(1)}%</span>
               <span>Low: {(result.prob_low * 100).toFixed(1)}%</span>
             </div>
@@ -102,7 +102,7 @@ export function VideoUploadResults({ result }: VideoUploadResultsProps) {
                       <p className="text-sm font-medium text-ink">
                         {feature.name.replace(/_/g, ' ')}
                       </p>
-                      <span className="text-xs px-2 py-0.5 bg-surface-strong text-muted rounded">
+                      <span className="text-xs px-2 py-0.5 bg-surface-strong text-muted-foreground rounded">
                         {feature.direction}
                       </span>
                     </div>
@@ -115,7 +115,7 @@ export function VideoUploadResults({ result }: VideoUploadResultsProps) {
                           }}
                         />
                       </div>
-                      <span className="text-xs text-muted whitespace-nowrap">
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
                         Saliency: {(feature.saliency * 100).toFixed(0)}%
                       </span>
                     </div>
@@ -142,7 +142,7 @@ export function VideoUploadResults({ result }: VideoUploadResultsProps) {
       ) : null}
 
       {result.latency_ms !== undefined && (
-        <div className="text-xs text-muted text-right">
+        <div className="text-xs text-muted-foreground text-right">
           Pipeline latency: {result.latency_ms.toFixed(2)}ms
         </div>
       )}

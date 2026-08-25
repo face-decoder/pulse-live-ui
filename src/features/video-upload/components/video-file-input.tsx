@@ -48,7 +48,7 @@ export function VideoFileInput({
           <div className="flex flex-col items-center justify-center pt-2 pb-2">
             <Upload
               className={`w-10 h-10 mb-2 ${
-                selectedFile ? 'text-brand-teal' : 'text-muted'
+                selectedFile ? 'text-brand-teal' : 'text-muted-foreground'
               }`}
             />
             {selectedFile ? (
@@ -56,7 +56,7 @@ export function VideoFileInput({
                 <p className="text-sm font-semibold text-ink">
                   {selectedFile.name}
                 </p>
-                <p className="text-xs text-muted mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   {formatFileSize(selectedFile.size)}
                 </p>
                 <p className="text-xs text-brand-teal font-medium mt-2">
@@ -68,7 +68,7 @@ export function VideoFileInput({
                 <p className="text-sm font-semibold text-ink">
                   Click to select or drag video file
                 </p>
-                <p className="text-xs text-muted">
+                <p className="text-xs text-muted-foreground">
                   MP4, WebM, MOV or other video formats
                 </p>
               </>
@@ -78,7 +78,7 @@ export function VideoFileInput({
       </div>
 
       {selectedFile && (
-        <div className="mt-2 text-xs text-muted">
+        <div className="mt-2 text-xs text-muted-foreground">
           <p>
             Selected:{' '}
             <span className="font-medium text-ink">{selectedFile.name}</span>

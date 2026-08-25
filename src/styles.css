@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -26,7 +27,8 @@
   --color-ink: #0a0a0a;
   --color-body-strong: #1a1a1a;
   --color-body: #3a3a3a;
-  --color-muted: #6a6a6a;
+  --color-muted: #faf5e8;
+  --color-muted-foreground: #6a6a6a;
   --color-muted-soft: #9a9a9a;
   --color-on-primary: #ffffff;
   --color-on-dark: #ffffff;
@@ -37,6 +39,30 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-pill: 9999px;
+
+  --color-background: var(--color-canvas);
+  --color-foreground: var(--color-ink);
+
+  --color-card: var(--color-surface-card);
+  --color-card-foreground: var(--color-ink);
+
+  --color-popover: var(--color-surface-card);
+  --color-popover-foreground: var(--color-ink);
+
+  --color-primary-foreground: var(--color-on-primary);
+
+  --color-secondary: var(--color-surface-strong);
+  --color-secondary-foreground: var(--color-ink);
+
+  --color-accent: var(--color-surface-soft);
+  --color-accent-foreground: var(--color-ink);
+
+  --color-destructive: var(--color-brand-coral);
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: var(--color-hairline);
+  --color-input: var(--color-hairline);
+  --color-ring: var(--color-brand-pink);
 }
 
 html,

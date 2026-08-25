@@ -12,6 +12,7 @@ import { useWebRTC } from '#/hooks/use-web-rtc'
 import { useSimulatedPrediction } from '#/features/video-capture/hooks/use-simulated-prediction'
 import type { PredictionResult } from '#/types'
 import { env } from '#/env'
+import { Button } from '#/components/ui/button'
 import { SiteHeader } from './components/site-header'
 import type { LandingSection } from './components/site-header'
 import { HeroSection } from './components/hero-section'
@@ -114,17 +115,17 @@ export default function VideoCapture() {
                   <p className="text-sm font-bold text-ink">
                     Camera is offline
                   </p>
-                  <p className="text-xs text-muted leading-relaxed">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     Allow camera access to experience real-time neural face
                     tracking.
                   </p>
                   {!isStreamActive && (
-                    <button
+                    <Button
                       onClick={startStream}
-                      className="mt-1 rounded-md bg-brand-pink text-white hover:bg-brand-pink/90 px-4 py-2 text-xs font-bold transition-all shadow-sm cursor-pointer border-none font-sans"
+                      className="mt-1 bg-brand-pink text-white hover:bg-brand-pink/90 text-xs font-bold"
                     >
                       Enable Camera Access
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>

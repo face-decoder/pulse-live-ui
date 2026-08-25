@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { useGlobalLatencySummary } from '#/features/history/services/use-global-latency-summary'
 import { getErrorMessage } from '#/lib/api'
 import { Loader2, Activity, Zap, Database, Clock } from 'lucide-react'
+import { Card } from '#/components/ui/card'
 
 interface PipelineStage {
   label: string
@@ -62,13 +63,13 @@ export default function GlobalLatencyPage() {
   return (
     <div className="bg-canvas min-h-screen text-ink p-8">
       <div className="w-full max-w-[95vw] mx-auto space-y-6">
-        <div className="bg-surface-card border border-hairline rounded-xl p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <Card className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2 text-ink">
               <Zap className="w-6 h-6 text-brand-coral" />
               Dashboard Latensi Global
             </h1>
-            <p className="text-muted mt-2">
+            <p className="text-muted-foreground mt-2">
               Agregasi rata-rata latensi dari seluruh sesi dan deteksi yang
               pernah tercatat di sistem.
             </p>
@@ -79,40 +80,42 @@ export default function GlobalLatencyPage() {
           >
             Kembali ke Daftar Riwayat
           </Link>
-        </div>
+        </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-surface-card border border-hairline rounded-xl p-8 shadow-sm flex items-center gap-6">
+          <Card className="p-8 flex items-center gap-6">
             <div className="bg-brand-blue/10 p-4 rounded-full">
               <Database className="w-8 h-8 text-brand-blue" />
             </div>
             <div>
-              <div className="text-muted mb-1 font-medium">
+              <div className="text-muted-foreground mb-1 font-medium">
                 Total Deteksi Dianalisis
               </div>
               <div className="text-4xl font-bold text-ink">
                 {totalDetections}
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-surface-card border border-hairline rounded-xl p-8 shadow-sm flex items-center gap-6">
+          <Card className="p-8 flex items-center gap-6">
             <div className="bg-brand-coral/10 p-4 rounded-full">
               <Clock className="w-8 h-8 text-brand-coral" />
             </div>
             <div>
-              <div className="text-muted mb-1 font-medium">
+              <div className="text-muted-foreground mb-1 font-medium">
                 Rata-Rata Latensi Total (Global)
               </div>
               <div className="text-4xl font-bold text-brand-coral">
                 {averages.total_latency_ms.toFixed(2)}{' '}
-                <span className="text-lg font-normal text-muted">ms</span>
+                <span className="text-lg font-normal text-muted-foreground">
+                  ms
+                </span>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
-        <div className="bg-surface-card border border-hairline rounded-xl p-8 shadow-sm">
+        <Card className="p-8">
           <h2 className="text-lg font-semibold mb-6 flex items-center gap-2">
             <Activity className="w-5 h-5 text-brand-blue" />
             Komposisi Latensi Pipeline Global
@@ -124,7 +127,7 @@ export default function GlobalLatencyPage() {
                 key={stage.label}
                 className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4"
               >
-                <div className="w-40 text-sm font-medium text-muted">
+                <div className="w-40 text-sm font-medium text-muted-foreground">
                   {stage.label}
                 </div>
                 <div className="flex-1 h-4 bg-surface-soft rounded-full overflow-hidden">
@@ -141,7 +144,7 @@ export default function GlobalLatencyPage() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   )

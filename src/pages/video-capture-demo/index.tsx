@@ -22,6 +22,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { env } from '#/env'
+import { Button } from '#/components/ui/button'
 
 export default function VideoCaptureDemo() {
   const {
@@ -101,13 +102,12 @@ export default function VideoCaptureDemo() {
       <header className="border-b border-hairline bg-canvas h-16 shrink-0">
         <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-muted hover:text-ink transition-colors px-3 py-1.5 rounded-md border border-hairline bg-surface-soft/40 hover:bg-surface-soft"
-            >
-              <ChevronLeft size={14} />
-              <span>Back to Home</span>
-            </Link>
+            <Button variant="outline" asChild className="text-xs font-bold">
+              <Link to="/">
+                <ChevronLeft />
+                Back to Home
+              </Link>
+            </Button>
 
             <span className="h-6 w-px bg-hairline" />
 
@@ -122,7 +122,7 @@ export default function VideoCaptureDemo() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-muted">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
               <ShieldCheck size={14} className="text-brand-teal" />
               <span>Session Secure</span>
             </div>
@@ -149,7 +149,7 @@ export default function VideoCaptureDemo() {
               <div className="w-3 h-3 rounded-full bg-brand-ochre/40" />
               <div className="w-3 h-3 rounded-full bg-brand-mint/40" />
             </div>
-            <span className="text-[10px] font-bold text-muted uppercase tracking-widest">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
               Primary Video Stream
             </span>
             <div className="w-12" />
@@ -174,7 +174,7 @@ export default function VideoCaptureDemo() {
                 </div>
                 <div className="max-w-xs flex flex-col items-center gap-3">
                   <p className="text-sm font-bold text-ink">Webcam inactive</p>
-                  <p className="text-xs text-muted mt-1 leading-relaxed">
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                     Activate your camera using the controls below to start
                     real-time prediction.
                   </p>
@@ -216,7 +216,7 @@ export default function VideoCaptureDemo() {
         <div className="w-full lg:w-80 flex flex-col shrink-0 gap-4 overflow-y-auto max-h-[calc(100vh-8rem)]">
           <div className="flex items-center gap-1.5">
             <Cpu size={14} className="text-brand-pink" />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-muted">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Expression Telemetry
             </h2>
           </div>
@@ -241,7 +241,7 @@ export default function VideoCaptureDemo() {
               <p className="text-xs font-bold text-ink">
                 Telemetry Awaiting Input
               </p>
-              <p className="text-[10px] text-muted mt-2 leading-relaxed max-w-[200px]">
+              <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed max-w-[200px]">
                 Please turn on your camera stream. Once active, model results
                 will populate this panel instantly.
               </p>
