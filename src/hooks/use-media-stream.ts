@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
+declare global {
+  interface MediaTrackConstraints {
+    cursor?: 'always' | 'motion' | 'never'
+  }
+}
+
 export interface UseMediaStreamReturn {
   stream: MediaStream | null
   isMuted: boolean
@@ -133,7 +139,7 @@ export function useMediaStream(
 
     try {
       const display = await navigator.mediaDevices.getDisplayMedia({
-        video: { cursor: 'always' } as MediaTrackConstraints,
+        video: { cursor: 'always' },
         audio: false,
       })
 

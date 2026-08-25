@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { uploadFileOverWebSocket } from '#/lib/chunked-upload'
 import { UploadState, VideoStatus } from '#/types'
 import type { ServerMessage, UploadProgressState, UploadResult } from '#/types'
+import { parseServerMessage } from '#/lib/server-message'
 
 interface UseVideoUploadOptions {
   wsUrl?: string
@@ -103,16 +104,17 @@ export function useVideoUpload(options: UseVideoUploadOptions = {}) {
 
   const handleMessage = useCallback(
     (event: MessageEvent) => {
+      if (typeof event.data !== 'string') return
+
       let data: unknown
       try {
-        data = JSON.parse(event.data as string)
+        data = JSON.parse(event.data)
       } catch {
         return
       }
 
-      if (typeof data === 'object' && data !== null && 'type' in data) {
-        applyMessage(data as ServerMessage)
-      }
+      const message = parseServerMessage(data)
+      if (message) applyMessage(message)
     },
     [applyMessage],
   )

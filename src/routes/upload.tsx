@@ -3,7 +3,14 @@ import { useState, useRef, useMemo } from 'react'
 import { env } from '#/env'
 import { MotionTelemetryChart } from '#/features/micro-expression/components/motion-telemetry-chart'
 import { uploadFileOverWebSocket } from '#/lib/chunked-upload'
+import { VideoStatus } from '#/types'
 import type { PredictionResult, TelemetryChunk } from '#/types'
+import {
+  errorMessageSchema,
+  predictionResultSchema,
+  videoStatusMessageSchema,
+} from '#/lib/server-message'
+import { z } from 'zod'
 import { Card, CardHeader, CardTitle } from '#/components/ui/card'
 import { DetectionLabelBadge } from '#/components/detection-label-badge'
 import {
@@ -15,14 +22,31 @@ import {
   TableRow,
 } from '#/components/ui/table'
 
-interface RollingSummary {
-  total_windows: number
-  anxiety_detected: number
-  avg_confidence: number
-  magnitudes?: number[]
-  smoothed_magnitudes?: number[]
-  detected_phases?: Array<{ onset: number; apex: number; offset: number }>
-}
+const rollingSummarySchema = z.object({
+  total_windows: z.number(),
+  anxiety_detected: z.number(),
+  avg_confidence: z.number(),
+  magnitudes: z.array(z.number()).optional(),
+  smoothed_magnitudes: z.array(z.number()).optional(),
+  detected_phases: z
+    .array(
+      z.object({
+        onset: z.number(),
+        apex: z.number(),
+        offset: z.number(),
+      }),
+    )
+    .optional(),
+})
+
+type RollingSummary = z.infer<typeof rollingSummarySchema>
+
+const uploadMessageSchema = z.discriminatedUnion('type', [
+  predictionResultSchema,
+  rollingSummarySchema.extend({ type: z.literal('summary') }),
+  videoStatusMessageSchema,
+  errorMessageSchema,
+])
 
 enum UploadStatus {
   Idle = 'idle',
@@ -63,29 +87,35 @@ function VideoUploadRoute() {
     }
 
     ws.onmessage = (event) => {
-      try {
-        const data: unknown = JSON.parse(event.data as string)
-        if (typeof data !== 'object' || data === null || !('type' in data))
-          return
+      if (typeof event.data !== 'string') return
 
-        if (data.type === 'prediction') {
-          setPredictions((prev) => [...prev, data as PredictionResult])
-        } else if (
-          data.type === 'summary' &&
-          'data' in data &&
-          typeof data.data === 'object' &&
-          data.data !== null
-        ) {
-          setSummary(data.data as RollingSummary)
-        } else if (
-          data.type === 'status' &&
-          (data as { status?: string }).status === 'completed'
-        ) {
-          setStatus(UploadStatus.Completed)
-        } else if (data.type === 'error') {
+      let parsed: unknown
+      try {
+        parsed = JSON.parse(event.data)
+      } catch {
+        return
+      }
+
+      const result = uploadMessageSchema.safeParse(parsed)
+      if (!result.success) return
+
+      const message = result.data
+      switch (message.type) {
+        case 'prediction':
+          setPredictions((prev) => [...prev, message])
+          break
+        case 'summary':
+          setSummary(message)
+          break
+        case 'status':
+          if (message.status === VideoStatus.Completed) {
+            setStatus(UploadStatus.Completed)
+          }
+          break
+        case 'error':
           setStatus(UploadStatus.Error)
-        }
-      } catch {}
+          break
+      }
     }
   }
 

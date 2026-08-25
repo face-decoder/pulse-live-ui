@@ -39,7 +39,7 @@ export function CaptureStage({
   children,
 }: CaptureStageProps) {
   return (
-    <div className="relative flex-1 bg-canvas aspect-video min-h-[400px] overflow-hidden flex items-center justify-center">
+    <div className="relative flex-1 bg-canvas aspect-video min-h-100 overflow-hidden flex items-center justify-center">
       {children}
 
       <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
